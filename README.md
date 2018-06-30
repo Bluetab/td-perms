@@ -1,6 +1,6 @@
 # TdPerms
 
-**TODO: Add description**
+TrueDat Permissions application. Uses Redis to store and query session permissions.
 
 ## Installation
 
