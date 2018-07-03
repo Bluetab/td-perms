@@ -4,11 +4,11 @@ defmodule TdPerms.Permissions do
 
   def permissions, do: @permissions |> Map.keys
 
-  def has_permission(session_id, permission, resource_type, resource_id) when is_bitstring(permission) do
-    has_permission(session_id, String.to_atom(permission), resource_type, resource_id)
+  def has_permission?(session_id, permission, resource_type, resource_id) when is_bitstring(permission) do
+    has_permission?(session_id, String.to_atom(permission), resource_type, resource_id)
   end
 
-  def has_permission(session_id, permission, resource_type, resource_id) do
+  def has_permission?(session_id, permission, resource_type, resource_id) do
     key = get_key(session_id, resource_type, resource_id)
     cmds = Map.get(@permissions, permission)
       |> get_bit_cmd
