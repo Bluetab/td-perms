@@ -20,6 +20,8 @@ use Mix.Config
 #
 #     config :logger, level: :info
 #
+config :td_perms, redis_uri: "redis://localhost"
+
 config :td_perms, permissions: [
   :is_admin,
   :create_acl_entry,
