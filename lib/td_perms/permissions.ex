@@ -2,6 +2,8 @@ defmodule TdPerms.Permissions do
   @moduledoc """
   Shared cache for permissions.
   """
+  alias TdPerms.Taxonomy
+
   @permissions Application.get_env(:td_perms, :permissions) |> Enum.with_index() |> Map.new()
 
   @permissions_by_offset Application.get_env(:td_perms, :permissions)
@@ -19,7 +21,12 @@ defmodule TdPerms.Permissions do
     has_permission?(session_id, String.to_atom(permission), resource_type, resource_id)
   end
 
-  def has_permission?(session_id, permission, resource_type, resource_id) do
+  def has_permission?(session_id, permission, "domain", domain_id) do
+    Taxonomy.get_parent_ids(domain_id, true)
+    |> Enum.any?(&(has_resource_permission?(session_id, permission, "domain", &1)))
+  end
+
+  defp has_resource_permission?(session_id, permission, resource_type, resource_id) do
     key = get_key(session_id, resource_type, resource_id)
 
     cmds =

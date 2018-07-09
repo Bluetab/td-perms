@@ -7,10 +7,12 @@ defmodule TdPerms.Taxonomy do
   def get_parent_ids(domain_id, false) do
     key = create_key(domain_id)
     {:ok, parent_ids} = Redix.command(:redix, ["HGET", key, "parent_ids"])
-
-    parent_ids
-    |> String.split(",")
-    |> Enum.map(&String.to_integer/1)
+    case parent_ids do
+      nil -> []
+      ids -> ids
+        |> String.split(",")
+        |> Enum.map(&String.to_integer/1)
+    end
   end
   def get_parent_ids(domain_id, true) do
     [domain_id|get_parent_ids(domain_id, false)]
