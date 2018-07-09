@@ -9,6 +9,7 @@ defmodule TdPerms.Taxonomy do
     {:ok, parent_ids} = Redix.command(:redix, ["HGET", key, "parent_ids"])
     case parent_ids do
       nil -> []
+      "" -> []
       ids -> ids
         |> String.split(",")
         |> Enum.map(&String.to_integer/1)

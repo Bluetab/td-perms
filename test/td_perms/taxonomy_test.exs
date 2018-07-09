@@ -20,6 +20,12 @@ defmodule TdPerms.TaxonomyTest do
     assert Taxonomy.get_parent_ids(domain.id, false) == domain.parent_ids
   end
 
+  test "get_parent_ids when domain has no parents returns an empty list" do
+    domain = domain_fixture() |> Map.put(:parent_ids, [])
+    Taxonomy.put_domain(domain)
+    assert Taxonomy.get_parent_ids(domain.id, false) == []
+  end
+
   test "get_name returns name" do
     domain = domain_fixture()
     Taxonomy.put_domain(domain)
