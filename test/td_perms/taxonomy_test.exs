@@ -8,10 +8,16 @@ defmodule TdPerms.TaxonomyTest do
     assert Taxonomy.put_domain(domain) == {:ok, "OK"}
   end
 
-  test "get_parent_ids returns parent ids" do
+  test "get_parent_ids with self returns parent ids including domain_id" do
     domain = domain_fixture()
     Taxonomy.put_domain(domain)
-    assert Taxonomy.get_parent_ids(domain.id) == domain.parent_ids
+    assert Taxonomy.get_parent_ids(domain.id) == [domain.id|domain.parent_ids]
+  end
+
+  test "get_parent_ids without self returns parent ids excluding domain_id" do
+    domain = domain_fixture()
+    Taxonomy.put_domain(domain)
+    assert Taxonomy.get_parent_ids(domain.id, false) == domain.parent_ids
   end
 
   test "get_name returns name" do
@@ -21,6 +27,6 @@ defmodule TdPerms.TaxonomyTest do
   end
 
   defp domain_fixture do
-    %{id: 1, parent_ids: [1, 2, 3, 4], name: "foo"}
+    %{id: 1, parent_ids: [2, 3, 4], name: "foo"}
   end
 end
