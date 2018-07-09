@@ -31,6 +31,11 @@ defmodule TdPerms.Taxonomy do
     Redix.command(:redix, ["HMSET", key, "parent_ids", parent_ids, "name", name])
   end
 
+  def delete_domain(domain_id) do
+    key = create_key(domain_id)
+    Redix.command(:redix, ["DEL", key])
+  end
+
   defp create_key(domain_id) do
     "domain:#{domain_id}"
   end

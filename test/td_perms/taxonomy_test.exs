@@ -32,6 +32,13 @@ defmodule TdPerms.TaxonomyTest do
     assert Taxonomy.get_name(domain.id) == domain.name
   end
 
+  test "delete_domain deletes the domain from cache" do
+    domain = domain_fixture()
+    Taxonomy.put_domain(domain)
+    Taxonomy.delete_domain(domain.id)
+    assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "domain:#{domain.id}"])
+  end
+
   defp domain_fixture do
     %{id: 1, parent_ids: [2, 3, 4], name: "foo"}
   end
