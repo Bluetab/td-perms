@@ -1,4 +1,4 @@
-defmodule TdPerms.Taxonomy do
+defmodule TdPerms.TaxonomyCache do
   @moduledoc """
   Shared cache for taxonomy hierarchy.
   """
