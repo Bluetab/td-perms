@@ -4,12 +4,13 @@ defmodule TdPerms.FieldLinkCache do
   """
   def get_concepts(data_field_id) do
     key = create_key(data_field_id)
-    {:ok, concept} = Redix.command(:redix, ["SMEMBERS", key])
-    concept
+    {:ok, concepts} = Redix.command(:redix, ["SMEMBERS", key])
+    concepts
   end
 
-  def put_field_link(%{id: data_field_id, concept: concept}) do
+  def put_field_link(%{id: data_field_id, concept: %{id: id, name: name}}) do
     key = create_key(data_field_id)
+    concept = "#{id}:::#{name}"
     Redix.command(:redix, ["SADD", key, concept])
   end
 
