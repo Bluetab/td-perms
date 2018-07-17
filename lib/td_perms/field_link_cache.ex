@@ -5,7 +5,7 @@ defmodule TdPerms.FieldLinkCache do
   def get_concepts(data_field_id) do
     key = create_key(data_field_id)
     {:ok, concepts} = Redix.command(:redix, ["SMEMBERS", key])
-    concepts
+    Enum.map(concepts, fn(concept) -> %{id: List.first(String.split(concept, ":::")), name: List.last(String.split(concept, ":::"))} end)
   end
 
   def put_field_link(%{id: data_field_id, concept: %{id: id, name: name}}) do
