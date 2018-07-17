@@ -17,7 +17,7 @@ defmodule TdPerms.PermissionsTest do
   end
 
   defp bc_fixture do
-    %{id: 1, domain_id: 1}
+    %{id: 1, domain_id: 1, name: "prueba"}
   end
 
   defp domain_fixture do

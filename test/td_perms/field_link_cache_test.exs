@@ -13,7 +13,8 @@ defmodule TdPerms.FieldLinkCacheTest do
     field_link = field_link_fixture()
     FieldLinkCache.put_field_link(field_link)
     assert FieldLinkCache.get_concepts(field_link.id)
-     == ["#{field_link.concept.id}:::#{field_link.concept.name}"]
+     == [%{id: field_link.concept.id, name: field_link.concept.name}]
+     # == ["#{field_link.concept.id}:::#{field_link.concept.name}"]
   end
 
   test "delete_field_link deletes the business concept from cache" do
