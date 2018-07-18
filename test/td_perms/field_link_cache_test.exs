@@ -9,6 +9,13 @@ defmodule TdPerms.FieldLinkCacheTest do
     assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
   end
 
+  test "put_field_link should return an error when trying to insert to resources into a link" do
+    field_link = field_link_fixture()
+    FieldLinkCache.delete_field_link(field_link.id)
+    assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
+    assert FieldLinkCache.put_field_link(field_link) == {:ok, 0}
+  end
+
   test "get_resources from a field" do
     field_link = field_link_fixture()
     FieldLinkCache.put_field_link(field_link)

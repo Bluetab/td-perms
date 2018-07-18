@@ -15,6 +15,13 @@ defmodule TdPerms.BusinessConceptCacheTest do
      == business_concept.domain_id
   end
 
+  test "get_name from a business_concept" do
+    business_concept = bc_fixture()
+    BusinessConceptCache.put_business_concept(business_concept)
+    assert BusinessConceptCache.get_name(business_concept.id)
+     == business_concept.name
+  end
+
   test "delete_business_concept deletes the business concept from cache" do
     business_concept = bc_fixture()
     BusinessConceptCache.put_business_concept(business_concept)
