@@ -9,12 +9,16 @@ defmodule TdPerms.FieldLinkCacheTest do
     assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
   end
 
-  test "get_concepts from a business concept" do
+  test "get_resources from a field" do
     field_link = field_link_fixture()
     FieldLinkCache.put_field_link(field_link)
-    assert FieldLinkCache.get_concepts(field_link.id)
-     == [%{id: field_link.concept.id, name: field_link.concept.name}]
-     # == ["#{field_link.concept.id}:::#{field_link.concept.name}"]
+
+    assert FieldLinkCache.get_resources(field_link.id) == [
+             %{
+               resource_id: field_link.resource.resource_id,
+               resource_name: field_link.resource.resource_name
+             }
+           ]
   end
 
   test "delete_field_link deletes the business concept from cache" do
@@ -25,6 +29,6 @@ defmodule TdPerms.FieldLinkCacheTest do
   end
 
   defp field_link_fixture do
-    %{id: 1, concept: %{id: 18, name: "cuadrado"}}
+    %{id: 1, resource: %{resource_id: 18, resource_name: "cuadrado"}}
   end
 end
