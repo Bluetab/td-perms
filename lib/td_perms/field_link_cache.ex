@@ -16,11 +16,14 @@ defmodule TdPerms.FieldLinkCache do
 
   def put_field_link(%{
         id: data_field_id,
-        resource: %{resource_id: resource_id, resource_name: resource_name}
+        resource: resource
       }) do
     key = create_key(data_field_id)
-    resource = "#{resource_id}:::#{resource_name}"
-    Redix.command(:redix, ["SADD", key, resource])
+    # For now we only have business_concept in the link manager
+    # but in the future we should retrieve the field resource_type as param
+    resource_name = retrieve_resource_name(resource)
+    resource_string = "#{resource.resource_id}:::#{resource_name}"
+    Redix.command(:redix, ["SADD", key, resource_string])
   end
 
   def delete_field_link(data_field_id) do
@@ -30,14 +33,28 @@ defmodule TdPerms.FieldLinkCache do
 
   def delete_resource_from_link(%{
         id: data_field_id,
-        resource: %{resource_id: resource_id, resource_name: resource_name}
-  }) do
+        resource: resource
+      }) do
     key = create_key(data_field_id)
-    resource = "#{resource_id}:::#{resource_name}"
-    Redix.command(:redix, ["SREM", key, resource])
+    resource_name = retrieve_resource_name(resource)
+    resource_string = "#{resource.resource_id}:::#{resource_name}"
+    Redix.command(:redix, ["SREM", key, resource_string])
   end
 
   defp create_key(data_field_id) do
     "data_field:#{data_field_id}"
+  end
+
+  defp retrieve_resource_name(resource) do
+    if Map.has_key?(resource, :resource_name) do
+      resource.resource_name
+    else
+      retrieve_resource_attr(resource.resource_id, "business_concept", "name")
+    end
+  end
+
+  defp retrieve_resource_attr(resource_id, resource_type, field) do
+    {:ok, value} = Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}", field])
+    value
   end
 end

@@ -1,10 +1,18 @@
 defmodule TdPerms.FieldLinkCacheTest do
   use ExUnit.Case
   alias TdPerms.FieldLinkCache
+  alias TdPerms.BusinessConceptCache
   doctest TdPerms.FieldLinkCache
 
   test "put_field_link returns Ok" do
     field_link = field_link_fixture()
+    FieldLinkCache.delete_field_link(field_link.id)
+    assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
+  end
+
+  test "put_field_link returns Ok retrieving name from existing resource" do
+    bc_fixture()
+    field_link = field_link_fixture_without_name()
     FieldLinkCache.delete_field_link(field_link.id)
     assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
   end
@@ -40,8 +48,16 @@ defmodule TdPerms.FieldLinkCacheTest do
     assert {:ok, 1} = FieldLinkCache.delete_resource_from_link(List.last(delete_resource_list()))
   end
 
+  defp bc_fixture do
+    BusinessConceptCache.put_business_concept(%{id: 18, domain_id: 1, name: "prueba"})
+  end
+
   defp field_link_fixture do
     %{id: 1, resource: %{resource_id: 18, resource_name: "cuadrado"}}
+  end
+
+  defp field_link_fixture_without_name do
+    %{id: 1, resource: %{resource_id: 18}}
   end
 
   defp delete_resource_list do
