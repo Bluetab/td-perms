@@ -28,14 +28,29 @@ defmodule TdPerms.FieldLinkCacheTest do
            ]
   end
 
-  test "delete_field_link deletes the business concept from cache" do
+  test "delete_field_link deletes the link from cache" do
     field_link = field_link_fixture()
     FieldLinkCache.put_field_link(field_link)
     FieldLinkCache.delete_field_link(field_link.id)
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "field_link:#{field_link.id}"])
   end
 
+  test "delete_resource_from_link deletes the resoruce from cache" do
+    delete_resource_fixture()
+    assert {:ok, 1} = FieldLinkCache.delete_resource_from_link(List.last(delete_resource_list()))
+  end
+
   defp field_link_fixture do
     %{id: 1, resource: %{resource_id: 18, resource_name: "cuadrado"}}
+  end
+
+  defp delete_resource_list do
+    [%{id: 1, resource: %{resource_id: 18, resource_name: "cuadrado"}},
+    %{id: 1, resource: %{resource_id: 19, resource_name: "cuadrado"}}]
+  end
+
+  defp delete_resource_fixture do
+    delete_resource_list()
+      |> Enum.map(&FieldLinkCache.put_field_link(&1))
   end
 end

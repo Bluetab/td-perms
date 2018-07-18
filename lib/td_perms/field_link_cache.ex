@@ -28,11 +28,10 @@ defmodule TdPerms.FieldLinkCache do
     Redix.command(:redix, ["DEL", key])
   end
 
-  # TODO: delete resource from a data_field
-  def delete_resource_from_link(
-        data_field_id,
+  def delete_resource_from_link(%{
+        id: data_field_id,
         resource: %{resource_id: resource_id, resource_name: resource_name}
-      ) do
+  }) do
     key = create_key(data_field_id)
     resource = "#{resource_id}:::#{resource_name}"
     Redix.command(:redix, ["SREM", key, resource])
