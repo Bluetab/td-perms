@@ -2,59 +2,46 @@ defmodule TdPerms.FieldLinkCache do
   @moduledoc """
     Shared cache for Link Manager.
   """
-  def get_resources(data_field_id) do
-    key = create_key(data_field_id)
+  def get_resources(resource_id, resource_type) do
+    key = create_key(resource_id, resource_type)
     {:ok, resources} = Redix.command(:redix, ["SMEMBERS", key])
-
-    Enum.map(resources, fn resource ->
-      %{
-        resource_id: String.to_integer(List.first(String.split(resource, ":::"))),
-        resource_name: List.last(String.split(resource, ":::"))
-      }
-    end)
+    resources
+      |> Enum.map(fn (r) ->
+        r_split = String.split(r, ":")
+        %{resource_type: List.first(r_split), resource_id: List.last(r_split)}
+        end)
+      |> Enum.map(&Map.put_new(&1, :resource_name, get_resource_attr("name", &1.resource_type, &1.resource_id)))
   end
 
   def put_field_link(%{
-        id: data_field_id,
+        id: id,
+        resource_type: resource_type,
         resource: resource
       }) do
-    key = create_key(data_field_id)
-    # For now we only have business_concept in the link manager
-    # but in the future we should retrieve the field resource_type as param
-    resource_name = retrieve_resource_name(resource)
-    resource_string = "#{resource.resource_id}:::#{resource_name}"
-    Redix.command(:redix, ["SADD", key, resource_string])
+    key = create_key(id, resource_type)
+    Redix.command(:redix, ["SADD", key, "#{resource.resource_type}:#{resource.resource_id}"])
   end
 
-  def delete_field_link(data_field_id) do
-    key = create_key(data_field_id)
+  def delete_link(resource_id, resource_type) do
+    key = create_key(resource_id, resource_type)
     Redix.command(:redix, ["DEL", key])
   end
 
   def delete_resource_from_link(%{
-        id: data_field_id,
+        id: id,
+        resource_type: resource_type,
         resource: resource
       }) do
-    key = create_key(data_field_id)
-    resource_name = retrieve_resource_name(resource)
-    resource_string = "#{resource.resource_id}:::#{resource_name}"
-    Redix.command(:redix, ["SREM", key, resource_string])
+    key = create_key(id, resource_type)
+    Redix.command(:redix, ["SREM", key, "#{resource.resource_type}:#{resource.resource_id}"])
   end
 
-  defp create_key(data_field_id) do
-    "data_field:#{data_field_id}"
+  def get_resource_attr(field, resource_type, resource_id) do
+    {:ok, attr} = Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}", field])
+    attr
   end
 
-  defp retrieve_resource_name(resource) do
-    if Map.has_key?(resource, :resource_name) do
-      resource.resource_name
-    else
-      retrieve_resource_attr(resource.resource_id, "business_concept", "name")
-    end
-  end
-
-  defp retrieve_resource_attr(resource_id, resource_type, field) do
-    {:ok, value} = Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}", field])
-    value
+  defp create_key(resource_id, resource_type) do
+    "#{resource_type}:#{resource_id}:links"
   end
 end

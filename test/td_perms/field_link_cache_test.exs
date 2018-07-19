@@ -6,67 +6,56 @@ defmodule TdPerms.FieldLinkCacheTest do
 
   test "put_field_link returns Ok" do
     field_link = field_link_fixture()
-    FieldLinkCache.delete_field_link(field_link.id)
-    assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
-  end
-
-  test "put_field_link returns Ok retrieving name from existing resource" do
-    bc_fixture()
-    field_link = field_link_fixture_without_name()
-    FieldLinkCache.delete_field_link(field_link.id)
+    FieldLinkCache.delete_link(field_link.id, field_link.resource_type)
     assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
   end
 
   test "put_field_link should return an error when trying to insert to resources into a link" do
     field_link = field_link_fixture()
-    FieldLinkCache.delete_field_link(field_link.id)
+    FieldLinkCache.delete_link(field_link.id, field_link.resource_type)
     assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
     assert FieldLinkCache.put_field_link(field_link) == {:ok, 0}
   end
 
   test "get_resources from a field" do
-    field_link = field_link_fixture()
-    FieldLinkCache.put_field_link(field_link)
-
-    assert FieldLinkCache.get_resources(field_link.id) == [
-             %{
-               resource_id: field_link.resource.resource_id,
-               resource_name: field_link.resource.resource_name
-             }
-           ]
+    bc_fixture()
+    resource_list_fixture()
+    result_list = FieldLinkCache.get_resources(1, "field")
+    assert length(result_list) == 2
+    Enum.any?(result_list, &(&1.resource_id == "18"))
+    Enum.any?(result_list, &(&1.resource_id == "19"))
   end
 
   test "delete_field_link deletes the link from cache" do
     field_link = field_link_fixture()
     FieldLinkCache.put_field_link(field_link)
-    FieldLinkCache.delete_field_link(field_link.id)
-    assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "field_link:#{field_link.id}"])
+    FieldLinkCache.delete_link(field_link.id, field_link.resource_type)
+    assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{field_link.resource_type}:#{field_link.id}:links"])
   end
 
-  test "delete_resource_from_link deletes the resoruce from cache" do
-    delete_resource_fixture()
-    assert {:ok, 1} = FieldLinkCache.delete_resource_from_link(List.last(delete_resource_list()))
+  test "delete_resource_from_link deletes the resource from cache" do
+    resource_list_fixture()
+    field_link = List.last(resource_list())
+    assert {:ok, 1} = FieldLinkCache.delete_resource_from_link(field_link)
+    Redix.command(:redix, ["EXISTS", "#{field_link.resource_type}:#{field_link.id}:links"])
   end
 
   defp bc_fixture do
-    BusinessConceptCache.put_business_concept(%{id: 18, domain_id: 1, name: "prueba"})
+    BusinessConceptCache.put_business_concept(%{id: 18, domain_id: 1, name: "test_18"})
+    BusinessConceptCache.put_business_concept(%{id: 19, domain_id: 1, name: "test_19"})
   end
 
   defp field_link_fixture do
-    %{id: 1, resource: %{resource_id: 18, resource_name: "cuadrado"}}
+    %{id: 1, resource_type: "field", resource: %{resource_id: 18, resource_type: "business_concept"}}
   end
 
-  defp field_link_fixture_without_name do
-    %{id: 1, resource: %{resource_id: 18}}
+  defp resource_list do
+    [%{id: 1, resource_type: "field", resource: %{resource_id: 18, resource_type: "business_concept"}},
+    %{id: 1, resource_type: "field", resource: %{resource_id: 19, resource_type: "business_concept"}}]
   end
 
-  defp delete_resource_list do
-    [%{id: 1, resource: %{resource_id: 18, resource_name: "cuadrado"}},
-    %{id: 1, resource: %{resource_id: 19, resource_name: "cuadrado"}}]
-  end
-
-  defp delete_resource_fixture do
-    delete_resource_list()
+  defp resource_list_fixture do
+    resource_list()
       |> Enum.map(&FieldLinkCache.put_field_link(&1))
   end
 end
