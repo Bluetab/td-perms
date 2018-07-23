@@ -6,15 +6,15 @@ defmodule TdPerms.FieldLinkCacheTest do
 
   test "put_field_link returns Ok" do
     field_link = field_link_fixture()
-    FieldLinkCache.delete_link(field_link.id, field_link.resource_type)
-    assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
+    delete_link(field_link)
+    assert FieldLinkCache.put_field_link(field_link) == {:ok, [1, 1]}
   end
 
   test "put_field_link should return an error when trying to insert to resources into a link" do
     field_link = field_link_fixture()
-    FieldLinkCache.delete_link(field_link.id, field_link.resource_type)
-    assert FieldLinkCache.put_field_link(field_link) == {:ok, 1}
-    assert FieldLinkCache.put_field_link(field_link) == {:ok, 0}
+    delete_link(field_link)
+    assert FieldLinkCache.put_field_link(field_link) == {:ok, [1, 1]}
+    assert FieldLinkCache.put_field_link(field_link) == {:ok, [0, 0]}
   end
 
   test "get_resources from a field" do
@@ -29,15 +29,17 @@ defmodule TdPerms.FieldLinkCacheTest do
   test "delete_field_link deletes the link from cache" do
     field_link = field_link_fixture()
     FieldLinkCache.put_field_link(field_link)
-    FieldLinkCache.delete_link(field_link.id, field_link.resource_type)
-    assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{field_link.resource_type}:#{field_link.id}:links"])
+    resource_origin = field_link.resource_origin
+    FieldLinkCache.delete_link(resource_origin.resource_id, resource_origin.resource_type)
+    assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{resource_origin.resource_type}:#{resource_origin.resource_id}:links"])
   end
 
   test "delete_resource_from_link deletes the resource from cache" do
     resource_list_fixture()
     field_link = List.last(resource_list())
-    assert {:ok, 1} = FieldLinkCache.delete_resource_from_link(field_link)
-    Redix.command(:redix, ["EXISTS", "#{field_link.resource_type}:#{field_link.id}:links"])
+    assert {:ok, [1, 1]} = FieldLinkCache.delete_resource_from_link(field_link)
+    resource_origin = field_link.resource_origin
+    Redix.command(:redix, ["EXISTS", "#{resource_origin.resource_type}:#{resource_origin.resource_id}:links"])
   end
 
   defp bc_fixture do
@@ -46,16 +48,23 @@ defmodule TdPerms.FieldLinkCacheTest do
   end
 
   defp field_link_fixture do
-    %{id: 1, resource_type: "field", resource: %{resource_id: 18, resource_type: "business_concept"}}
+    %{resource_origin: %{resource_id: 1, resource_type: "field"}, resource_target: %{resource_id: 18, resource_type: "business_concept"}}
   end
 
   defp resource_list do
-    [%{id: 1, resource_type: "field", resource: %{resource_id: 18, resource_type: "business_concept"}},
-    %{id: 1, resource_type: "field", resource: %{resource_id: 19, resource_type: "business_concept"}}]
+    [%{resource_origin: %{resource_id: 1, resource_type: "field"}, resource_target: %{resource_id: 18, resource_type: "business_concept"}},
+    %{resource_origin: %{resource_id: 1, resource_type: "field"}, resource_target: %{resource_id: 19, resource_type: "business_concept"}}]
   end
 
   defp resource_list_fixture do
     resource_list()
       |> Enum.map(&FieldLinkCache.put_field_link(&1))
+  end
+
+  defp delete_link(link) do
+    link
+      |> Map.keys()
+      |> Enum.map(&Map.fetch!(link, &1))
+      |> Enum.map(&FieldLinkCache.delete_link(&1.resource_id, &1.resource_type))
   end
 end
