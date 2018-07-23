@@ -1,7 +1,7 @@
 defmodule TdPerms.FieldLinkCacheTest do
   use ExUnit.Case
-  alias TdPerms.FieldLinkCache
   alias TdPerms.BusinessConceptCache
+  alias TdPerms.FieldLinkCache
   doctest TdPerms.FieldLinkCache
 
   test "put_field_link returns Ok" do
@@ -31,7 +31,12 @@ defmodule TdPerms.FieldLinkCacheTest do
     FieldLinkCache.put_field_link(field_link)
     resource_origin = field_link.resource_origin
     FieldLinkCache.delete_link(resource_origin.resource_id, resource_origin.resource_type)
-    assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{resource_origin.resource_type}:#{resource_origin.resource_id}:links"])
+
+    assert {:ok, 0} =
+             Redix.command(:redix, [
+               "EXISTS",
+               "#{resource_origin.resource_type}:#{resource_origin.resource_id}:links"
+             ])
   end
 
   test "delete_resource_from_link deletes the resource from cache" do
@@ -39,32 +44,58 @@ defmodule TdPerms.FieldLinkCacheTest do
     field_link = List.last(resource_list())
     assert {:ok, [1, 1]} = FieldLinkCache.delete_resource_from_link(field_link)
     resource_origin = field_link.resource_origin
-    Redix.command(:redix, ["EXISTS", "#{resource_origin.resource_type}:#{resource_origin.resource_id}:links"])
+
+    Redix.command(:redix, [
+      "EXISTS",
+      "#{resource_origin.resource_type}:#{resource_origin.resource_id}:links"
+    ])
   end
 
   defp bc_fixture do
-    BusinessConceptCache.put_business_concept(%{id: 18, domain_id: 1, name: "test_18"})
-    BusinessConceptCache.put_business_concept(%{id: 19, domain_id: 1, name: "test_19"})
+    BusinessConceptCache.put_business_concept(%{
+      id: 18,
+      domain_id: 1,
+      name: "test_18",
+      business_concept_version_id: 1
+    })
+
+    BusinessConceptCache.put_business_concept(%{
+      id: 19,
+      domain_id: 1,
+      name: "test_19",
+      business_concept_version_id: 1
+    })
   end
 
   defp field_link_fixture do
-    %{resource_origin: %{resource_id: 1, resource_type: "field"}, resource_target: %{resource_id: 18, resource_type: "business_concept"}}
+    %{
+      resource_origin: %{resource_id: 1, resource_type: "field"},
+      resource_target: %{resource_id: 18, resource_type: "business_concept"}
+    }
   end
 
   defp resource_list do
-    [%{resource_origin: %{resource_id: 1, resource_type: "field"}, resource_target: %{resource_id: 18, resource_type: "business_concept"}},
-    %{resource_origin: %{resource_id: 1, resource_type: "field"}, resource_target: %{resource_id: 19, resource_type: "business_concept"}}]
+    [
+      %{
+        resource_origin: %{resource_id: 1, resource_type: "field"},
+        resource_target: %{resource_id: 18, resource_type: "business_concept"}
+      },
+      %{
+        resource_origin: %{resource_id: 1, resource_type: "field"},
+        resource_target: %{resource_id: 19, resource_type: "business_concept"}
+      }
+    ]
   end
 
   defp resource_list_fixture do
     resource_list()
-      |> Enum.map(&FieldLinkCache.put_field_link(&1))
+    |> Enum.map(&FieldLinkCache.put_field_link(&1))
   end
 
   defp delete_link(link) do
     link
-      |> Map.keys()
-      |> Enum.map(&Map.fetch!(link, &1))
-      |> Enum.map(&FieldLinkCache.delete_link(&1.resource_id, &1.resource_type))
+    |> Map.keys()
+    |> Enum.map(&Map.fetch!(link, &1))
+    |> Enum.map(&FieldLinkCache.delete_link(&1.resource_id, &1.resource_type))
   end
 end

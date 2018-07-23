@@ -22,6 +22,13 @@ defmodule TdPerms.BusinessConceptCacheTest do
      == business_concept.name
   end
 
+  test "get_business_concept_version_id from a business_concept" do
+    business_concept = bc_fixture()
+    BusinessConceptCache.put_business_concept(business_concept)
+    assert String.to_integer(BusinessConceptCache.get_business_concept_version_id(business_concept.id))
+     == business_concept.business_concept_version_id
+  end
+
   test "delete_business_concept deletes the business concept from cache" do
     business_concept = bc_fixture()
     BusinessConceptCache.put_business_concept(business_concept)
@@ -30,6 +37,6 @@ defmodule TdPerms.BusinessConceptCacheTest do
   end
 
   defp bc_fixture do
-    %{id: 1, domain_id: 1, name: "prueba"}
+    %{id: 1, domain_id: 1, name: "test", business_concept_version_id: 1}
   end
 end
