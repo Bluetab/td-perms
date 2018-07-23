@@ -12,11 +12,11 @@ defmodule TdPerms.FieldLinkCache do
       %{resource_type: List.first(r_split), resource_id: List.last(r_split)}
     end)
     |> Enum.map(
-      &Map.put_new(
-        &1,
-        :resource_name,
-        get_resource_attr("name", &1.resource_type, &1.resource_id)
-      )
+      &Map.merge(&1, %{
+        resource_name: get_resource_attr("name", &1.resource_type, &1.resource_id),
+        business_concept_version_id:
+          get_resource_attr("business_concept_version_id", &1.resource_type, &1.resource_id)
+      })
     )
   end
 
