@@ -39,15 +39,15 @@ defmodule TdPerms.TaxonomyCache do
     cursor = 0
     key = "domain:*"
     {next_cursor, init_list_domains} = retrieve_list_from_enumerator(cursor, key)
-    loop_over_scan_iteracions(key, init_list_domains, next_cursor)
+    loop_over_scan_iterations(key, init_list_domains, next_cursor)
   end
 
-  defp loop_over_scan_iteracions(_key, acc_list_domains, 0), do: acc_list_domains
+  defp loop_over_scan_iterations(_key, acc_list_domains, 0), do: acc_list_domains
 
-  defp loop_over_scan_iteracions(key, acc_list_domains, cursor) do
+  defp loop_over_scan_iterations(key, acc_list_domains, cursor) do
     {next_cursor, list_domains} = retrieve_list_from_enumerator(cursor, key)
     acc_list_domains = acc_list_domains ++ list_domains
-    loop_over_scan_iteracions(key, acc_list_domains, next_cursor)
+    loop_over_scan_iterations(key, acc_list_domains, next_cursor)
   end
 
   defp retrieve_list_from_enumerator(cursor, key) do
