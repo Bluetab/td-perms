@@ -36,9 +36,33 @@ defmodule TdPerms.TaxonomyCache do
   end
 
   def get_all_domains do
+    cursor = 0
     key = "domain:*"
-    {:ok, keys} = Redix.command(:redix, ["KEYS", key])
-    Enum.map(keys, &get_domain(&1))
+    {next_cursor, init_list_domains} = retrieve_list_from_enumerator(cursor, key)
+    loop_over_scan_iteracions(key, init_list_domains, next_cursor)
+  end
+
+  defp loop_over_scan_iteracions(_key, acc_list_domains, 0), do: acc_list_domains
+
+  defp loop_over_scan_iteracions(key, acc_list_domains, cursor) do
+    {next_cursor, list_domains} = retrieve_list_from_enumerator(cursor, key)
+    acc_list_domains = acc_list_domains ++ list_domains
+    loop_over_scan_iteracions(key, acc_list_domains, next_cursor)
+  end
+
+  defp retrieve_list_from_enumerator(cursor, key) do
+    {:ok, [head|tail]} = scan_command(cursor, key)
+    list_domains = get_domains_from_list_keys(tail |> List.flatten())
+    {String.to_integer(head), list_domains}
+  end
+
+  defp get_domains_from_list_keys(list_keys) do
+    list_keys
+     |> Enum.map(&get_domain(&1))
+  end
+
+  defp scan_command(cursor, key) do
+    Redix.command(:redix, ["SCAN", cursor, "MATCH", key])
   end
 
   defp get_domain(key) do
