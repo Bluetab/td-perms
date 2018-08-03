@@ -14,6 +14,8 @@ defmodule TdPerms.PermissionsTest do
     Permissions.cache_session_permissions!(session_id, now + 100, acl_entries)
     assert Permissions.has_permission?(session_id, :create_business_concept, "domain", 1)
     assert Permissions.has_permission?(session_id, :create_business_concept, "business_concept", business_concept.id)
+    assert Permissions.has_any_permission?(session_id, [:create_business_concept], "domain", 1)
+    assert Permissions.has_any_permission?(session_id, [:create_business_concept], "business_concept", business_concept.id)
   end
 
   defp bc_fixture do

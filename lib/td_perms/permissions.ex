@@ -34,7 +34,12 @@ defmodule TdPerms.Permissions do
     |> (&has_permission?(session_id, permission, "domain", &1)).()
   end
 
-  def has_any_permission?(session_id, permissions, resource_type) do
+  def has_any_permission?(session_id, permissions, resource_type, resource_id) do
+    permissions
+    |> Enum.any?(&(has_permission?(session_id, &1, resource_type, resource_id)))
+  end
+
+  def has_any_permission_on_resource_type?(session_id, permissions, resource_type) do
     session_id
       |> get_acls_by_resource_type(resource_type)
       |> Enum.flat_map(&(&1.permissions))
