@@ -2,6 +2,7 @@ defmodule TdPerms.PermissionsTest do
   use ExUnit.Case
   alias TdPerms.Permissions
   alias TdPerms.TaxonomyCache
+  alias TdPerms.BusinessConceptCache
   doctest TdPerms.Permissions
 
   test "blah" do
@@ -11,6 +12,7 @@ defmodule TdPerms.PermissionsTest do
     acl_entries = acl_entries_fixture()
     now = DateTime.utc_now() |> DateTime.to_unix
     {:ok, _} = TaxonomyCache.put_domain(domain)
+    {:ok, _} = BusinessConceptCache.put_business_concept(business_concept)
     Permissions.cache_session_permissions!(session_id, now + 100, acl_entries)
     assert Permissions.has_permission?(session_id, :create_business_concept, "domain", 1)
     assert Permissions.has_permission?(session_id, :create_business_concept, "business_concept", business_concept.id)
@@ -19,7 +21,7 @@ defmodule TdPerms.PermissionsTest do
   end
 
   defp bc_fixture do
-    %{id: 1, domain_id: 1, name: "prueba"}
+    %{id: 1, domain_id: 1, name: "prueba", business_concept_version_id: 2}
   end
 
   defp domain_fixture do
