@@ -1,8 +1,8 @@
 defmodule TdPerms.PermissionsTest do
   use ExUnit.Case
+  alias TdPerms.BusinessConceptCache
   alias TdPerms.Permissions
   alias TdPerms.TaxonomyCache
-  alias TdPerms.BusinessConceptCache
   doctest TdPerms.Permissions
 
   test "blah" do

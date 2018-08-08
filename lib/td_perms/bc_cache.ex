@@ -40,6 +40,31 @@ defmodule TdPerms.BusinessConceptCache do
     ])
   end
 
+  def put_field_values(business_concept_id, values) do
+    key = create_key(business_concept_id)
+    value_list = values
+    |> Enum.map(&([elem(&1, 0), elem(&1, 1)]))
+    |> List.flatten
+    Redix.command(:redix, ["HMSET", key] ++ value_list)
+  end
+
+  def get_field_values(_business_concept_id, []), do: %{}
+  def get_field_values(business_concept_id, fields) do
+    key = create_key(business_concept_id)
+    {:ok, values} = Redix.command(:redix, ["HMGET", key] ++ fields)
+    {:ok, Map.new(List.zip([fields, values]))}
+  end
+
+  def increment(business_concept_id, field) do
+    key = create_key(business_concept_id)
+    Redix.command(:redix, ["HINCRBY", key, field, 1])
+  end
+
+  def decrement(business_concept_id, field) do
+    key = create_key(business_concept_id)
+    Redix.command(:redix, ["HINCRBY", key, field, -1])
+  end
+
   def delete_business_concept(business_concept_id) do
     key = create_key(business_concept_id)
     Redix.command(:redix, ["DEL", key])
