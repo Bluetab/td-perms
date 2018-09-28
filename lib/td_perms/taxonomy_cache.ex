@@ -3,6 +3,24 @@ defmodule TdPerms.TaxonomyCache do
   Shared cache for taxonomy hierarchy.
   """
 
+  @get_root_domain_keys """
+    local cursor = 0
+    local root_domain_keys = {}
+    repeat
+      local result = redis.call('SCAN', cursor, 'MATCH', 'domain:*')
+      cursor = tonumber(result[1])
+      local domain_keys = result[2]
+      local parent_ids
+      for i, domain_key in ipairs(domain_keys) do
+        parent_ids = redis.call('HGET', domain_key, 'parent_ids')
+          if parent_ids == "" then
+            root_domain_keys[#root_domain_keys + 1] = domain_key
+          end
+        end
+    until cursor == 0
+    return root_domain_keys
+  """
+
   def get_parent_ids(domain_id, with_self \\ true)
 
   def get_parent_ids(domain_id, false) do
@@ -74,15 +92,14 @@ defmodule TdPerms.TaxonomyCache do
   end
 
   def get_root_domain_ids do
-    all_domains = get_all_domains()
-    all_domains
-    |> Enum.filter(fn(domain) ->
-      case get_parent_ids(domain.domain_id, false) do
-        [] -> true
-        _ -> false
-      end
+    {:ok, domain_keys} = Redix.command(:redix, ["EVAL", @get_root_domain_keys, 0])
+    domain_keys
+    |> Enum.map(fn(domain_key) ->
+      domain_key
+      |> String.split(":")
+      |> List.last()
+      |> String.to_integer()
     end)
-    |> Enum.map(&(&1.domain_id))
   end
 
   defp get_domain(key) do
