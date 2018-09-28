@@ -73,6 +73,18 @@ defmodule TdPerms.TaxonomyCache do
     Redix.command(:redix, ["SCAN", cursor, "MATCH", key])
   end
 
+  def get_root_domain_ids do
+    all_domains = get_all_domains()
+    all_domains
+    |> Enum.filter(fn(domain) ->
+      case get_parent_ids(domain.domain_id, false) do
+        [] -> true
+        _ -> false
+      end
+    end)
+    |> Enum.map(&(&1.domain_id))
+  end
+
   defp get_domain(key) do
     %{}
     |> Map.put(:name, get_domain_name(key))
