@@ -30,27 +30,27 @@ defmodule TdPerms.BusinessConceptCacheTest do
   end
 
   test "get_field_values from a business_concept" do
-    q_rule_count = 23
+    rule_count = 23
     link_count = 32
-    BusinessConceptCache.put_field_values(1, q_rule_count: q_rule_count, link_count: link_count)
-    {:ok, values} = BusinessConceptCache.get_field_values(1, [:q_rule_count, :link_count])
-    assert String.to_integer(values.q_rule_count) == q_rule_count
+    BusinessConceptCache.put_field_values(1, rule_count: rule_count, link_count: link_count)
+    {:ok, values} = BusinessConceptCache.get_field_values(1, [:rule_count, :link_count])
+    assert String.to_integer(values.rule_count) == rule_count
     assert String.to_integer(values.link_count) == link_count
   end
 
-  test "increment q_rule_count and link_count" do
-    {:ok, q_rule_count} = BusinessConceptCache.increment(12, :q_rule_count)
+  test "increment rule_count and link_count" do
+    {:ok, rule_count} = BusinessConceptCache.increment(12, :rule_count)
     {:ok, link_count} = BusinessConceptCache.increment(12, :link_count)
-    {:ok, values} = BusinessConceptCache.get_field_values(12, [:q_rule_count, :link_count])
-    assert String.to_integer(values.q_rule_count) == q_rule_count
+    {:ok, values} = BusinessConceptCache.get_field_values(12, [:rule_count, :link_count])
+    assert String.to_integer(values.rule_count) == rule_count
     assert String.to_integer(values.link_count) == link_count
   end
 
-  test "decrement q_rule_count and link_count" do
-    {:ok, q_rule_count} = BusinessConceptCache.decrement(12, :q_rule_count)
+  test "decrement rule_count and link_count" do
+    {:ok, rule_count} = BusinessConceptCache.decrement(12, :rule_count)
     {:ok, link_count} = BusinessConceptCache.decrement(12, :link_count)
-    {:ok, values} = BusinessConceptCache.get_field_values(12, [:q_rule_count, :link_count])
-    assert String.to_integer(values.q_rule_count) == q_rule_count
+    {:ok, values} = BusinessConceptCache.get_field_values(12, [:rule_count, :link_count])
+    assert String.to_integer(values.rule_count) == rule_count
     assert String.to_integer(values.link_count) == link_count
   end
 
