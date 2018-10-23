@@ -4,7 +4,7 @@ defmodule TdPerms.MixProject do
   def project do
     [
       app: :td_perms,
-      version: "0.3.7",
+      version: "0.3.8",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -23,8 +23,7 @@ defmodule TdPerms.MixProject do
   defp deps do
     [
       {:redix, ">= 0.0.0"},
-      {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},
-      {:poison, "~> 4.0"}
+      {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false}
     ]
   end
 end
