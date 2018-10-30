@@ -8,9 +8,20 @@ defmodule TdPerms.DynamicFormCache do
     Poison.decode!(content)
   end
 
-  def put_template_content(%{
+  def get_template_by_name(template_name) do
+    key = create_key(template_name)
+    {:ok, [content, label]} = Redix.command(:redix, ["HMGET", key, "content", "label"])
+    %{
+      name: template_name,
+      label: label,
+      content: Poison.decode!(content)
+    }
+  end
+
+  def put_template(%{
         name: template_name,
-        content: content
+        content: content,
+        label: label
       }) do
     key = create_key(template_name)
 
@@ -18,16 +29,18 @@ defmodule TdPerms.DynamicFormCache do
       "HMSET",
       key,
       "content",
-      Poison.encode!(content)
+      Poison.encode!(content),
+      "label",
+      label
     ])
   end
 
-  def delete_template_content(template_name) do
+  def delete_template(template_name) do
     key = create_key(template_name)
     Redix.command(:redix, ["DEL", key])
   end
 
   def create_key(name) do
-    "template_content:#{name}"
+    "df_template:#{name}"
   end
 end

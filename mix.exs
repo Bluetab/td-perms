@@ -23,7 +23,8 @@ defmodule TdPerms.MixProject do
   defp deps do
     [
       {:redix, ">= 0.0.0"},
-      {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false}
+      {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},
+      {:poison, "~> 2.2.0"}
     ]
   end
 end

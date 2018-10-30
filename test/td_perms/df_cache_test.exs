@@ -3,27 +3,33 @@ defmodule TdPerms.DynamicFormCacheTest do
   alias TdPerms.DynamicFormCache
   doctest TdPerms.DynamicFormCache
 
-  test "put_template_content returns Ok" do
+  test "put_template returns Ok" do
     template = df_fixture()
-    assert DynamicFormCache.put_template_content(template) == {:ok, "OK"}
+    assert DynamicFormCache.put_template(template) == {:ok, "OK"}
   end
 
-  test "get_template_content" do
+  test "get_template_content gets content" do
     template = df_fixture()
-    DynamicFormCache.put_template_content(template)
+    DynamicFormCache.put_template(template)
     assert DynamicFormCache.get_template_content(template.name) == template.content
   end
 
-  test "delete_template_content deletes from cache" do
+  test "get_template_by_name gets template" do
     template = df_fixture()
-    DynamicFormCache.put_template_content(template)
-    DynamicFormCache.delete_template_content(template.name)
+    DynamicFormCache.put_template(template)
+    assert DynamicFormCache.get_template_by_name(template.name) == template
+  end
+
+  test "delete_template deletes from cache" do
+    template = df_fixture()
+    DynamicFormCache.put_template(template)
+    DynamicFormCache.delete_template(template.name)
     key = DynamicFormCache.create_key(template.name)
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{key}"])
   end
 
   defp df_fixture do
-    %{name: "test", content: [%{"name" => "field", "type" => "string"}]}
+    %{name: "test", content: [%{"name" => "field", "type" => "string"}], label: "label"}
   end
 
 end
