@@ -14,10 +14,18 @@ defmodule TdPerms.DynamicFormCacheTest do
     assert DynamicFormCache.get_template_content(template.name) == template.content
   end
 
+  test "get_template_content invalid key will return nil" do
+    assert DynamicFormCache.get_template_content("invalid:key") == nil
+  end
+
   test "get_template_by_name gets template" do
     template = df_fixture()
     DynamicFormCache.put_template(template)
     assert DynamicFormCache.get_template_by_name(template.name) == template
+  end
+
+  test "get_template_by_name invalid key will return nil" do
+    assert DynamicFormCache.get_template_by_name("invalid:key") == nil
   end
 
   test "delete_template deletes from cache" do
