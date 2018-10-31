@@ -28,6 +28,16 @@ defmodule TdPerms.DynamicFormCacheTest do
     assert DynamicFormCache.get_template_by_name("invalid:key") == nil
   end
 
+  test "list_templates will return a list of objects" do
+    template1 = df_fixture("t1")
+    template2 = df_fixture("t2")
+    template3 = df_fixture("t3")
+    DynamicFormCache.put_template(template1)
+    DynamicFormCache.put_template(template2)
+    DynamicFormCache.put_template(template3)
+    assert length(DynamicFormCache.list_templates()) >= 3
+  end
+
   test "delete_template deletes from cache" do
     template = df_fixture()
     DynamicFormCache.put_template(template)
@@ -40,4 +50,7 @@ defmodule TdPerms.DynamicFormCacheTest do
     %{name: "test", content: [%{"name" => "field", "type" => "string"}], label: "label"}
   end
 
+  defp df_fixture(name) do
+    %{name: name, content: [%{"name" => "field", "type" => "string"}], label: "label"}
+  end
 end
