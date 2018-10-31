@@ -29,6 +29,14 @@ defmodule TdPerms.AclCacheTest do
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{key}"])
   end
 
+  test "set_acl_role_users accepts an empty list" do
+    resource_id = 1
+    resource_type = "test_type"
+    role = "role1"
+    users = []
+    assert {:ok, _} = AclCache.set_acl_role_users(resource_id, resource_type, role, users)
+  end
+
   test "set_acl_role_users returns Ok" do
     resource_id = 1
     resource_type = "test_type"
