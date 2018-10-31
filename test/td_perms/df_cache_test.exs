@@ -28,6 +28,12 @@ defmodule TdPerms.DynamicFormCacheTest do
     assert DynamicFormCache.get_template_by_name("invalid:key") == nil
   end
 
+  test "get_default_template will return the default template" do
+    template = df_fixture_default()
+    DynamicFormCache.put_template(template)
+    assert DynamicFormCache.get_default_template() == Map.drop(template, [:is_default])
+  end
+
   test "list_templates will return a list of objects" do
     template1 = df_fixture("t1")
     template2 = df_fixture("t2")
@@ -52,5 +58,14 @@ defmodule TdPerms.DynamicFormCacheTest do
 
   defp df_fixture(name) do
     %{name: name, content: [%{"name" => "field", "type" => "string"}], label: "label"}
+  end
+
+  defp df_fixture_default do
+    %{
+      name: "test_default",
+      content: [%{"name" => "field", "type" => "string"}],
+      label: "label",
+      is_default: true
+    }
   end
 end
