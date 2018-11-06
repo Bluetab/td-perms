@@ -53,15 +53,16 @@ defmodule TdPerms.DynamicFormCacheTest do
   end
 
   defp df_fixture do
-    %{name: "test", content: [%{"name" => "field", "type" => "string"}], label: "label"}
+    %{id: 0, name: "test", content: [%{"name" => "field", "type" => "string"}], label: "label"}
   end
 
   defp df_fixture(name) do
-    %{name: name, content: [%{"name" => "field", "type" => "string"}], label: "label"}
+    %{id: 0, name: name, content: [%{"name" => "field", "type" => "string"}], label: "label"}
   end
 
   defp df_fixture_default do
     %{
+      id: 0,
       name: "test_default",
       content: [%{"name" => "field", "type" => "string"}],
       label: "label",

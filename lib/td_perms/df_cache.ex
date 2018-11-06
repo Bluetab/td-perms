@@ -17,11 +17,12 @@ defmodule TdPerms.DynamicFormCache do
   end
   def get_template_by_name(template_name) do
     key = create_key(template_name)
-    {:ok, [content, label]} = Redix.command(:redix, ["HMGET", key, "content", "label"])
+    {:ok, [id, content, label]} = Redix.command(:redix, ["HMGET", key, "id", "content", "label"])
     case content do
       nil -> nil
       content ->
         %{
+          id: parse_id(id),
           name: template_name,
           label: label,
           content: Poison.decode!(content)
@@ -30,16 +31,25 @@ defmodule TdPerms.DynamicFormCache do
   end
 
   def get_default_template() do
-    {:ok, [name, content, label]} = Redix.command(:redix,
-      ["HMGET", "df_template_default", "name", "content", "label"])
+    {:ok, [id, name, content, label]} = Redix.command(:redix,
+      ["HMGET", "df_template_default", "id", "name", "content", "label"])
     case content do
       nil -> nil
       content ->
         %{
+          id: parse_id(id),
           name: name,
           label: label,
           content: Poison.decode!(content)
         }
+    end
+  end
+
+  defp parse_id(nil), do: nil
+  defp parse_id(id_str) do
+    case Integer.parse(id_str) do
+      :error -> nil
+      {id, _} -> id
     end
   end
 
@@ -51,7 +61,8 @@ defmodule TdPerms.DynamicFormCache do
   def put_template(%{
         name: template_name,
         content: content,
-        label: label
+        label: label,
+        id: id
       } = template) do
     key = create_key(template_name)
 
@@ -59,6 +70,8 @@ defmodule TdPerms.DynamicFormCache do
       true -> Redix.command(:redix, [
           "HMSET",
           "df_template_default",
+          "id",
+          id,
           "name",
           template_name,
           "content",
@@ -72,6 +85,8 @@ defmodule TdPerms.DynamicFormCache do
     Redix.command(:redix, [
       "HMSET",
       key,
+      "id",
+      id,
       "content",
       Poison.encode!(content),
       "label",
