@@ -1,6 +1,12 @@
 # Changelog
 
-## [2.7.2] 2018-10-31
+## [2.7.2] 2018-11-07
+
+### Changed
+
+- Change Mock DF Cache to write only template fields
+
+## [2.7.2] 2018-11-07
 
 ### Changed
 

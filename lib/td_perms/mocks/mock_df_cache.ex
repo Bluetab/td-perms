@@ -4,6 +4,8 @@ defmodule TdPerms.MockDynamicFormCache do
   """
   use Agent
 
+  @template_fields [:content, :name, :label, :id]
+
   def start_link(_) do
     Agent.start_link(fn -> %{} end, name: :MockDfCache)
   end
@@ -52,7 +54,7 @@ defmodule TdPerms.MockDynamicFormCache do
     key = create_key(template_name)
 
     Agent.update(:MockDfCache, fn mock ->
-      clean_template = Map.drop(template, [:is_default])
+      clean_template = Map.take(template, @template_fields)
       new_mock = Map.put(mock, key, clean_template)
       case Map.get(template, :is_default, false) do
         true -> Map.put(new_mock, "df_template_default", clean_template)
