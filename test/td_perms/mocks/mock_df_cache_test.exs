@@ -52,7 +52,7 @@ defmodule TdPerms.MockMockDynamicFormCacheTest do
   test "delete_template deletes from cache" do
     template = df_fixture()
     MockDynamicFormCache.put_template(template)
-    MockDynamicFormCache.delete_template(template.name)
+    assert {:ok, _} = MockDynamicFormCache.delete_template(template.name)
     assert MockDynamicFormCache.get_template_by_name(template.name) == nil
   end
 

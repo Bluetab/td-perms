@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.7.4] 2018-11-07
+
+### Fixed
+
+- Mock DF Cache delete functionality return correct format
+
 ## [2.7.3] 2018-11-07
 
 ### Changed

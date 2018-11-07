@@ -47,7 +47,7 @@ defmodule TdPerms.DynamicFormCacheTest do
   test "delete_template deletes from cache" do
     template = df_fixture()
     DynamicFormCache.put_template(template)
-    DynamicFormCache.delete_template(template.name)
+    assert {:ok, _} = DynamicFormCache.delete_template(template.name)
     key = DynamicFormCache.create_key(template.name)
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{key}"])
   end

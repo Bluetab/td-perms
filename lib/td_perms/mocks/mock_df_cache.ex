@@ -67,6 +67,7 @@ defmodule TdPerms.MockDynamicFormCache do
   def delete_template(template_name) do
     key = create_key(template_name)
     Agent.update(:MockDfCache, & Map.drop(&1, [key]))
+    {:ok, "OK"}
   end
 
   def create_key(name) do
