@@ -65,7 +65,7 @@ defmodule TdPerms.MockMockDynamicFormCacheTest do
     MockDynamicFormCache.put_template(template3)
 
     MockDynamicFormCache.clean_cache()
-    assert length(MockDynamicFormCache.list_templates()) >= 0
+    assert length(MockDynamicFormCache.list_templates()) == 0
   end
 
   defp df_fixture do

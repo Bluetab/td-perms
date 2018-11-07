@@ -94,6 +94,9 @@ defmodule TdPerms.DynamicFormCache do
     ])
   end
 
+  def delete_template("df_template:" <> template_name) do
+    delete_template(template_name)
+  end
   def delete_template(template_name) do
     key = create_key(template_name)
     Redix.command(:redix, ["DEL", key])

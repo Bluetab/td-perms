@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.7.5] 2018-11-07
+
+### Fixed
+
+- Failure cleaning DF Cache
+
 ## [2.7.4] 2018-11-07
 
 ### Fixed
