@@ -19,7 +19,7 @@ defmodule TdPerms.AclCache do
     Redix.command(:redix, ["SADD", key] ++ roles)
   end
 
-  def set_acl_roles(resource_type, resource_id, roles = %MapSet{}) do
+  def set_acl_roles(resource_type, resource_id, %MapSet{} = roles) do
     set_acl_roles(resource_type, resource_id, MapSet.to_list(roles))
   end
 
@@ -51,7 +51,7 @@ defmodule TdPerms.AclCache do
     end
   end
 
-  def set_acl_role_users(resource_type, resource_id, role, users = %MapSet{}) do
+  def set_acl_role_users(resource_type, resource_id, role, %MapSet{} = users) do
     set_acl_role_users(resource_type, resource_id, role, MapSet.to_list(users))
   end
 

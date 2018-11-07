@@ -7,7 +7,7 @@ defmodule TdPerms.AclCacheTest do
     resource_id = 1
     resource_type = "test_type"
     roles = ["role1", "role2", "role3"]
-    assert AclCache.set_acl_roles(resource_id,resource_type,roles) == {:ok, length(roles)}
+    assert AclCache.set_acl_roles(resource_id, resource_type, roles) == {:ok, length(roles)}
   end
 
   test "get_acl_roles returns same value that was put" do

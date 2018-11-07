@@ -5,14 +5,14 @@ defmodule TdPerms.DynamicFormCache do
   def get_template_content(template_name) do
     key = create_key(template_name)
     {:ok, content} = Redix.command(:redix, ["HGET", key, "content"])
-    
+
     case content do
       nil -> nil
       content -> Poison.decode!(content)
     end
   end
 
-  def get_template_by_name("df_template:"<>template_name) do
+  def get_template_by_name("df_template:" <> template_name) do
     get_template_by_name(template_name)
   end
   def get_template_by_name(template_name) do
@@ -30,7 +30,7 @@ defmodule TdPerms.DynamicFormCache do
     end
   end
 
-  def get_default_template() do
+  def get_default_template do
     {:ok, [id, name, content, label]} = Redix.command(:redix,
       ["HMGET", "df_template_default", "id", "name", "content", "label"])
     case content do
@@ -53,7 +53,7 @@ defmodule TdPerms.DynamicFormCache do
     end
   end
 
-  def list_templates() do
+  def list_templates do
     {:ok, keys} = Redix.command(:redix, ["KEYS", create_key("*")])
     Enum.map(keys, &get_template_by_name(&1))
   end
@@ -97,6 +97,11 @@ defmodule TdPerms.DynamicFormCache do
   def delete_template(template_name) do
     key = create_key(template_name)
     Redix.command(:redix, ["DEL", key])
+  end
+
+  def clean_cache do
+    {:ok, keys} = Redix.command(:redix, ["KEYS", create_key("*")])
+    Enum.map(keys, &delete_template(&1))
   end
 
   def create_key(name) do

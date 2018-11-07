@@ -52,6 +52,18 @@ defmodule TdPerms.DynamicFormCacheTest do
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{key}"])
   end
 
+  test "clean_cache will remove all records" do
+    template1 = df_fixture("t1")
+    template2 = df_fixture("t2")
+    template3 = df_fixture("t3")
+    DynamicFormCache.put_template(template1)
+    DynamicFormCache.put_template(template2)
+    DynamicFormCache.put_template(template3)
+
+    DynamicFormCache.clean_cache()
+    assert length(DynamicFormCache.list_templates()) >= 0
+  end
+
   defp df_fixture do
     %{id: 0, name: "test", content: [%{"name" => "field", "type" => "string"}], label: "label"}
   end

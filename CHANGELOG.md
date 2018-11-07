@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.2] 2018-10-31
+
+### Changed
+
+- Add clean_cache feature on DF Cache
+- Add Mock for DF Cache
+
 ## [2.7.1] 2018-10-31
 
 ### Changed
