@@ -18,6 +18,17 @@ defmodule TdPerms.UserCache do
     Redix.command(:redix, ["HMSET", key, "user_name", user_name, "full_name", full_name, "email", email])
   end
 
+  def get_user_email(full_name) do
+    key = create_email_key(full_name)
+    {:ok, email} = Redix.command(:redix, ["GET", key])
+    email
+  end
+
+  def put_user_email(%{full_name: full_name, email: email}) do
+    key = create_email_key(full_name)
+    Redix.command(:redix, ["SET", key, email])
+  end
+
   def delete_user(id) do
     key = create_key(id)
     Redix.command(:redix, ["DEL", key])
@@ -64,5 +75,9 @@ defmodule TdPerms.UserCache do
 
   defp create_key(id) do
     "user:#{id}"
+  end
+
+  defp create_email_key(id) do
+    "user_email:#{id}"
   end
 end

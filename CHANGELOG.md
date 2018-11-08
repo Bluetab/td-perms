@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.7.6] 2018-11-08
+
+### Added
+
+- Create user email cache, having the full_name as key
+
 ## [2.7.5] 2018-11-07
 
 ### Fixed

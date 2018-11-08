@@ -21,6 +21,17 @@ defmodule TdPerms.UserCacheTest do
     assert UserCache.get_user(user.id) == Map.take(user, [:user_name, :full_name, :email])
   end
 
+  test "put_user_email returns OK" do
+    user = user_fixture()
+    assert UserCache.put_user_email(user) == {:ok, "OK"}
+  end
+
+  test "get_user_email returns the email" do
+    user = user_fixture()
+    UserCache.put_user_email(user)
+    assert UserCache.get_user_email(user.full_name) == user.email
+  end
+
   test "get_user returns nil if the user is not cached" do
     assert UserCache.get_user("MISSING") == nil
   end
