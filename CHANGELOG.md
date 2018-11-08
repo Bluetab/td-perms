@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.7.6] 2018-11-08
+
+### Added
+
+- Cache for nonces
+
 ## [2.7.5] 2018-11-07
 
 ### Fixed
