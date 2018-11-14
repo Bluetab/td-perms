@@ -61,7 +61,7 @@ defmodule TdPerms.DynamicFormCacheTest do
     DynamicFormCache.put_template(template3)
 
     DynamicFormCache.clean_cache()
-    assert length(DynamicFormCache.list_templates()) == 0
+    assert Enum.empty?(DynamicFormCache.list_templates())
   end
 
   defp df_fixture do

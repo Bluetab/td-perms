@@ -4,7 +4,7 @@ defmodule TdPerms.MockMockDynamicFormCacheTest do
   doctest TdPerms.MockDynamicFormCache
 
   setup_all do
-    start_supervised MockDynamicFormCache
+    start_supervised(MockDynamicFormCache)
     :ok
   end
 
@@ -65,7 +65,7 @@ defmodule TdPerms.MockMockDynamicFormCacheTest do
     MockDynamicFormCache.put_template(template3)
 
     MockDynamicFormCache.clean_cache()
-    assert length(MockDynamicFormCache.list_templates()) == 0
+    assert Enum.empty?(MockDynamicFormCache.list_templates())
   end
 
   defp df_fixture do

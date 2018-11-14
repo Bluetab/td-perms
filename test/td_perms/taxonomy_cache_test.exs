@@ -46,9 +46,20 @@ defmodule TdPerms.TaxonomyCacheTest do
     result_list = TaxonomyCache.get_all_domains()
 
     list_domain_fixture()
-    |> Enum.all?(fn (x) ->
+    |> Enum.all?(fn x ->
       Enum.any?(result_list, &(&1.name == x.name))
     end)
+    |> assert
+  end
+
+  test "get_domain_name_to_id_map returns a map with names as keys and ids as values" do
+    list_domain_fixture()
+    |> Enum.map(&TaxonomyCache.put_domain(&1))
+
+    map = TaxonomyCache.get_domain_name_to_id_map()
+
+    list_domain_fixture()
+    |> Enum.all?(&Map.has_key?(map, &1.name))
     |> assert
   end
 
