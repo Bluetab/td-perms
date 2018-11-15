@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.8.1] 2018-11-15
+
+### Changed
+
+- BREAKING: Update Redix to 0.8.2 (use `:redis_host` in config instead of `:redis_uri`)
+- Simplified taxonomy cache and user cache (use MULTI commands instead of multiple put methods)
+- Added a SET for root domain ids
+
 ## [2.7.7] 2018-11-08
 
 ### Added

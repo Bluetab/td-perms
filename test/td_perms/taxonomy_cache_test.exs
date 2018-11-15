@@ -5,7 +5,7 @@ defmodule TdPerms.TaxonomyCacheTest do
 
   test "put_domain returns OK" do
     domain = domain_fixture()
-    assert TaxonomyCache.put_domain(domain) == {:ok, "OK"}
+    assert {:ok, ["OK", _]} = TaxonomyCache.put_domain(domain)
   end
 
   test "get_parent_ids with self returns parent ids including domain_id" do
@@ -37,19 +37,6 @@ defmodule TdPerms.TaxonomyCacheTest do
     TaxonomyCache.put_domain(domain)
     TaxonomyCache.delete_domain(domain.id)
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "domain:#{domain.id}"])
-  end
-
-  test "get_all_domains returns all the domains in the system" do
-    list_domain_fixture()
-    |> Enum.map(&TaxonomyCache.put_domain(&1))
-
-    result_list = TaxonomyCache.get_all_domains()
-
-    list_domain_fixture()
-    |> Enum.all?(fn x ->
-      Enum.any?(result_list, &(&1.name == x.name))
-    end)
-    |> assert
   end
 
   test "get_domain_name_to_id_map returns a map with names as keys and ids as values" do

@@ -6,11 +6,11 @@ defmodule TdPerms.Application do
   use Application
 
   def start(_type, _args) do
-    redis_uri = Application.get_env(:td_perms, :redis_uri)
+    redis_host = Application.get_env(:td_perms, :redis_host)
 
     # List all child processes to be supervised
     children = [
-      {Redix, [redis_uri, [name: :redix]]}
+      {Redix, host: redis_host, name: :redix}
       # Starts a worker by calling: TdPerms.Worker.start_link(arg)
       # {TdPerms.Worker, arg},
     ]

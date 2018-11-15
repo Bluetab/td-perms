@@ -12,6 +12,11 @@ defmodule TdPerms.UserCacheTest do
 
   test "put_user returns OK" do
     user = user_fixture()
+    assert UserCache.put_user(user) == {:ok, ["OK", "OK"]}
+  end
+
+  test "put_user without email returns OK" do
+    user = user_fixture() |> Map.drop([:email])
     assert UserCache.put_user(user) == {:ok, "OK"}
   end
 
@@ -21,14 +26,9 @@ defmodule TdPerms.UserCacheTest do
     assert UserCache.get_user(user.id) == Map.take(user, [:user_name, :full_name, :email])
   end
 
-  test "put_user_email returns OK" do
-    user = user_fixture()
-    assert UserCache.put_user_email(user) == {:ok, "OK"}
-  end
-
   test "get_user_email returns the email" do
     user = user_fixture()
-    UserCache.put_user_email(user)
+    UserCache.put_user(user)
     assert UserCache.get_user_email(user.full_name) == user.email
   end
 

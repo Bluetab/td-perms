@@ -22,7 +22,7 @@ defmodule TdPerms.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:redix, ">= 0.0.0"},
+      {:redix, "~> 0.8.2"},
       {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},
       {:poison, "~> 2.2.0"}
     ]

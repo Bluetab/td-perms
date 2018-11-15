@@ -14,19 +14,23 @@ defmodule TdPerms.UserCache do
   end
 
   def put_user(%{id: id, user_name: user_name, full_name: full_name, email: email}) do
-    key = create_key(id)
-    Redix.command(:redix, ["HMSET", key, "user_name", user_name, "full_name", full_name, "email", email])
+    user_key = create_key(id)
+    email_key = create_email_key(full_name)
+    Redix.command(:redix, ["MULTI"])
+    Redix.command(:redix, ["HMSET", user_key, "user_name", user_name, "full_name", full_name, "email", email])
+    Redix.command(:redix, ["SET", email_key, email])
+    Redix.command(:redix, ["EXEC"])
+  end
+
+  def put_user(%{id: id, user_name: user_name, full_name: full_name}) do
+    user_key = create_key(id)
+    Redix.command(:redix, ["HMSET", user_key, "user_name", user_name, "full_name", full_name])
   end
 
   def get_user_email(full_name) do
     key = create_email_key(full_name)
     {:ok, email} = Redix.command(:redix, ["GET", key])
     email
-  end
-
-  def put_user_email(%{full_name: full_name, email: email}) do
-    key = create_email_key(full_name)
-    Redix.command(:redix, ["SET", key, email])
   end
 
   def delete_user(id) do
