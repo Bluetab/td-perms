@@ -51,7 +51,20 @@ config :td_perms, permissions: [
   :view_deprecated_business_concepts,
   :manage_business_concept_links,
   :manage_quality_rule,
-  :manage_confidential_business_concepts
+  :manage_confidential_business_concepts,
+  :create_ingest,
+  :update_ingest,
+  :send_ingest_for_approval,
+  :delete_ingest,
+  :publish_ingest,
+  :reject_ingest,
+  :deprecate_ingest,
+  :view_draft_ingest,
+  :view_approval_pending_ingest,
+  :view_published_ingest,
+  :view_versioned_ingest,
+  :view_rejected_ingest,
+  :view_deprecated_ingests
 ]
 
 # It is also possible to import configuration files, relative to this
