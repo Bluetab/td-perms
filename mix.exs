@@ -4,7 +4,7 @@ defmodule TdPerms.MixProject do
   def project do
     [
       app: :td_perms,
-      version: "2.8.3",
+      version: "2.8.4",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
