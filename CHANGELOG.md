@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.10.0] 2018-12-18
+
+### Added
+
+- Added manage_confidential_structures permission
+
 ## [2.8.1] 2018-11-15
 
 ### Changed
