@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.11.0] 2019-01-11
+
+### Added
+
+- Added functionality to check permissions over all domains
+
 ## [2.10.1] 2019-01-11
 
 ### Added

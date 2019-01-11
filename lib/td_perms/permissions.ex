@@ -34,6 +34,19 @@ defmodule TdPerms.Permissions do
     |> (&has_permission?(session_id, permission, "domain", &1)).()
   end
 
+  def has_permission?(session_id, permission) do
+    :redix
+    |> Redix.command!(["KEYS", Enum.join(["session", session_id, "*"], ":")])
+    |> Enum.map(fn x ->
+        x
+        |> String.split(":")
+        |> Enum.slice(2, 2)
+      end)
+    |> Enum.any?(fn [resource_type, resource_id] ->
+        has_permission?(session_id, permission, resource_type, resource_id)
+      end)
+  end
+
   def has_any_permission?(session_id, permissions, resource_type, resource_id) do
     permissions
     |> Enum.any?(&(has_permission?(session_id, &1, resource_type, resource_id)))
