@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.10.1] 2019-01-11
+
+### Added
+
+- [TD-933] New cache for relations management
+
 ## [2.10.0] 2018-12-18
 
 ### Added
