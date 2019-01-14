@@ -8,4 +8,11 @@ defmodule TdPerms.NonceCacheTest do
     assert NonceCache.exists?(nonce)
   end
 
+  test "a nonce value can be read once after creation" do
+    nonce = NonceCache.create_nonce("Some value")
+    assert NonceCache.exists?(nonce)
+    assert NonceCache.pop(nonce) == "Some value"
+    assert NonceCache.pop(nonce) == nil
+  end
+
 end

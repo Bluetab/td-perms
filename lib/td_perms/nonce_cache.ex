@@ -25,6 +25,16 @@ defmodule TdPerms.NonceCache do
     end
   end
 
+  @doc """
+  Pops a specified nonce.
+  """
+  def pop(nonce) do
+    key = create_key(nonce)
+    {:ok, nonce} = Redix.command(:redix, ["GET", key])
+    Redix.command(:redix, ["DEL", key])
+    nonce
+  end
+
   defp generate_random_string(length) do
     length
     |> :crypto.strong_rand_bytes()
