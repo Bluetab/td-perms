@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.11.1] 2019-01-14
+
+### Added
+
+- Allow a value to be associated with a nonce
+
 ## [2.11.0] 2019-01-11
 
 ### Added

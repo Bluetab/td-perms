@@ -6,10 +6,10 @@ defmodule TdPerms.NonceCache do
   @doc """
   Create a nonce with a specified length and expiry.
   """
-  def create_nonce(length \\ 16, expiry_seconds \\ 3600) do
+  def create_nonce(value \\ "", length \\ 16, expiry_seconds \\ 3600) do
     nonce = generate_random_string(length)
     key = create_key(nonce)
-    "OK" = Redix.command!(:redix, ["SETEX", key, expiry_seconds, ""])
+    "OK" = Redix.command!(:redix, ["SETEX", key, expiry_seconds, value])
     nonce
   end
 
