@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.12.0] 2019-01-28
+
+### Added
+
+- [TD-1390] New sets in business concepts' cache to store the ids of the existing and deprecated business concepts
+
 ## [2.11.2] 2019-01-14
 
 ### Added
