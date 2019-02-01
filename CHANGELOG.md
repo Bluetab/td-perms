@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.12.1] 2019-02-01
+
+### Added
+
+- [TD-967] Contextual information will be stored when a relation in persisted on cache.
+    - The information will be persisted for both, the target and source of a relation.
+
 ## [2.12.0] 2019-01-28
 
 ### Added
