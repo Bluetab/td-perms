@@ -10,7 +10,23 @@ defmodule TdPerms.RelationCacheTest do
 
     put_results = RelationCache.put_relation(resources, relation_types)
     assert length(put_results) == length(relation_types)
-    assert Enum.all?(put_results, fn result -> result == {:ok, [1, 1]} end)
+    assert Enum.all?(put_results, fn result -> result == {{:ok, [1, 1]}, {:ok, ["OK", "OK"]}} end)
+
+    assert Enum.all?(relation_types, fn r_t ->
+             result_source =
+               Redix.command(:redix, [
+                 "EXISTS",
+                 "#{resources.source.source_type}:#{resources.source.source_id}:#{r_t}"
+               ])
+
+             result_target =
+               Redix.command(:redix, [
+                 "EXISTS",
+                 "#{resources.target.target_type}:#{resources.target.target_id}:#{r_t}"
+               ])
+
+             {:ok, 1} == result_source && {:ok, 1} == result_target
+           end)
 
     delete_relation(resources)
   end
@@ -21,16 +37,16 @@ defmodule TdPerms.RelationCacheTest do
 
     put_results = RelationCache.put_relation(resources, relation_types)
     assert length(put_results) == length(relation_types)
-    assert Enum.all?(put_results, fn result -> result == {:ok, [1, 1]} end)
+    assert Enum.all?(put_results, fn result -> result == {{:ok, [1, 1]}, {:ok, ["OK", "OK"]}} end)
 
     put_results = RelationCache.put_relation(resources, relation_types)
     assert length(put_results) == length(relation_types)
-    assert Enum.all?(put_results, fn result -> result == {:ok, [0, 0]} end)
+    assert Enum.all?(put_results, fn result -> result == {{:ok, [0, 0]}, {:ok, ["OK", "OK"]}} end)
 
     delete_relation(resources)
   end
 
-  test "delete_relation deletes the link from cache" do
+  test "delete_relation deletes the relation from cache" do
     {resources, relation_types} = relation_fixture()
     RelationCache.put_relation(resources, relation_types)
 
@@ -58,7 +74,7 @@ defmodule TdPerms.RelationCacheTest do
     resource_list_fixture()
     {resources_to_delete, resource_types} = List.last(resource_list())
 
-    assert [{:ok, [1, 1]}] =
+    assert [{{:ok, [1, 1]}, {:ok, [1]}}] =
              RelationCache.delete_resource_from_relation(resources_to_delete, resource_types)
 
     source = resources_to_delete.source
@@ -79,7 +95,7 @@ defmodule TdPerms.RelationCacheTest do
     delete_resources_list()
   end
 
-  test "get_resources from a data_field" do
+  test "get_resources from different resource types" do
     bc_fixture()
     resource_list_fixture()
     result_list = RelationCache.get_resources(1, "data_field")
@@ -88,6 +104,17 @@ defmodule TdPerms.RelationCacheTest do
     assert Enum.any?(result_list, &(&1.resource_id == "18"))
     assert Enum.any?(result_list, &(&1.name == "test_18"))
     assert Enum.any?(result_list, &(&1.business_concept_version_id == "1"))
+
+    result_list = RelationCache.get_resources(18, "business_concept")
+    assert length(result_list) == 2
+    assert Enum.any?(result_list, &(&1.resource_id == "1"))
+    assert Enum.any?(result_list, &(&1.resource_id == "2"))
+    assert Enum.all?(result_list, &(&1.context == %{}))
+
+    result_list = RelationCache.get_resources(18, "business_concept", %{relation_type: ["business_concept_to_field"]})
+    assert length(result_list) == 1
+    assert Enum.any?(result_list, &(&1.resource_id == "1"))
+    assert Enum.all?(result_list, &(&1.context == %{}))
 
     delete_resources_list()
   end
@@ -112,7 +139,8 @@ defmodule TdPerms.RelationCacheTest do
     {
       %{
         source: %{source_id: 18, source_type: "business_concept"},
-        target: %{target_id: 1, target_type: "data_field"}
+        target: %{target_id: 1, target_type: "data_field"},
+        context: %{}
       },
       ["business_concept_to_field", "business_concept_to_field_master"]
     }
@@ -123,16 +151,18 @@ defmodule TdPerms.RelationCacheTest do
       {
         %{
           source: %{source_id: 18, source_type: "business_concept"},
-          target: %{target_id: 1, target_type: "data_field"}
+          target: %{target_id: 1, target_type: "data_field"},
+          context: %{}
         },
         ["business_concept_to_field"]
       },
       {
         %{
           source: %{source_id: 18, source_type: "business_concept"},
-          target: %{target_id: 2, target_type: "data_field"}
+          target: %{target_id: 2, target_type: "data_field"},
+          context: %{}
         },
-        ["business_concept_to_field"]
+        ["business_concept_to_field_master"]
       }
     ]
   end

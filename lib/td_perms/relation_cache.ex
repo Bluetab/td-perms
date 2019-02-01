@@ -12,6 +12,14 @@ defmodule TdPerms.RelationCache do
     |> Enum.map(&get_additional_attributes(&1))
   end
 
+  def get_resources(resource_id, resource_type, %{relation_type: rt_values}) do
+    resource_id
+    |> get_resources(resource_type)
+    |> Enum.filter(fn %{relation_type: relation_type} ->
+      Enum.member?(rt_values, relation_type)
+    end)
+  end
+
   def put_relation(
         resources,
         relation_types
@@ -19,7 +27,7 @@ defmodule TdPerms.RelationCache do
     source_target_keys = build_keys(resources)
 
     relation_types
-    |> Enum.map(&execute_sadd_command(source_target_keys, resources, &1))
+    |> Enum.map(&store_resources(source_target_keys, resources, &1))
   end
 
   def delete_relation(resources) do
@@ -36,39 +44,85 @@ defmodule TdPerms.RelationCache do
     source_target_keys = build_keys(resources)
 
     relation_types
-    |> Enum.map(&execute_srem_command(source_target_keys, resources, &1))
-  end
-
-  defp execute_sadd_command(
-         {key_source, key_target},
-         %{source: source, target: target},
-         relation_type
-       ) do
-
-    Redix.pipeline(:redix, [
-      ["SADD", key_source, "#{target.target_type}:#{target.target_id}:#{relation_type}"],
-      ["SADD", key_target, "#{source.source_type}:#{source.source_id}:#{relation_type}"]
-    ])
-  end
-
-  defp execute_srem_command(
-         {key_source, key_target},
-         %{source: source, target: target},
-         relation_type
-       ) do
-    Redix.pipeline(:redix, [
-      ["SREM", key_source, "#{target.target_type}:#{target.target_id}:#{relation_type}"],
-      [
-        "SREM",
-        key_target,
-        "#{source.source_type}:#{source.source_id}:#{relation_type}"
-      ]
-    ])
+    |> Enum.map(&delete_resources(source_target_keys, resources, &1))
   end
 
   def get_resource_attr(field, resource_type, resource_id) do
     {:ok, attr} = Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}", field])
     attr
+  end
+
+  def get_resource_attr(field, resource_type, resource_id, relation_type) do
+    {:ok, attr} =
+      Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}:#{relation_type}", field])
+
+    attr
+  end
+
+  defp store_resources(
+         {key_source, key_target},
+         %{source: source, target: target, context: context},
+         relation_type
+       ) do
+    key_resource_source = "#{source.source_type}:#{source.source_id}:#{relation_type}"
+    key_resource_target = "#{target.target_type}:#{target.target_id}:#{relation_type}"
+
+    {source_context, target_context} = build_context_from_resources(context)
+
+    result_resource_creation =
+      Redix.pipeline(:redix, [
+        ["HMSET", key_resource_source, "context", source_context],
+        ["HMSET", key_resource_target, "context", target_context]
+      ])
+
+    result_resource_append =
+      Redix.pipeline(:redix, [
+        ["SADD", key_source, key_resource_target],
+        ["SADD", key_target, key_resource_source]
+      ])
+
+    {result_resource_append, result_resource_creation}
+  end
+
+  defp build_context_from_resources(context) do
+    source_context = context |> Map.get("source", %{}) |> Poison.encode!()
+    target_context = context |> Map.get("target", %{}) |> Poison.encode!()
+
+    {source_context, target_context}
+  end
+
+  defp delete_resources(
+         {key_source, key_target},
+         %{source: source, target: target},
+         relation_type
+       ) do
+    key_resource_source = "#{source.source_type}:#{source.source_id}:#{relation_type}"
+    key_resource_target = "#{target.target_type}:#{target.target_id}:#{relation_type}"
+
+    result_deletion_from_set =
+      Redix.pipeline(:redix, [
+        ["SREM", key_source, key_resource_target],
+        ["SREM", key_target, key_resource_source]
+      ])
+
+    result_resource_deletion =
+      [{key_source, key_resource_source}, {key_target, key_resource_target}]
+      |> Enum.filter(fn {key_set, _} ->
+        case Redix.command(:redix, ["SCARD", key_set]) do
+          {:ok, 0} -> true
+          _ -> false
+        end
+      end)
+      |> Enum.map(fn {_, key_resource} -> ["DEL", key_resource] end)
+      |> delete_resources()
+
+    {result_deletion_from_set, result_resource_deletion}
+  end
+
+  defp delete_resources([]), do: {:ok, :empty_set}
+
+  defp delete_resources(resources_to_delete_pipeline) do
+    Redix.pipeline(:redix, resources_to_delete_pipeline)
   end
 
   defp get_common_attributes(resource) do
@@ -88,6 +142,18 @@ defmodule TdPerms.RelationCache do
     |> Map.put(
       :business_concept_version_id,
       get_resource_attr("business_concept_version_id", "business_concept", resource_id)
+    )
+    |> Map.merge(resource)
+  end
+
+  defp get_additional_attributes(
+         %{resource_id: resource_id, resource_type: "data_field", relation_type: relation_type} =
+           resource
+       ) do
+    Map.new()
+    |> Map.put(
+      :context,
+      get_resource_attr("context", "data_field", resource_id, relation_type) |> Poison.decode!()
     )
     |> Map.merge(resource)
   end
