@@ -3,6 +3,8 @@ defmodule TdPerms.BusinessConceptCache do
     Shared cache for Business Concepts.
   """
 
+  alias TdPerms.RelationCache
+
   def exists_bc_in_cache?(business_concept_id) do
     key = existing_bc_set_key()
     {:ok, result} = Redix.command(:redix, ["SISMEMBER", key, business_concept_id])
@@ -103,6 +105,14 @@ defmodule TdPerms.BusinessConceptCache do
   def delete_business_concept(business_concept_id) do
     key_bc = create_key(business_concept_id)
     key_bc_set = existing_bc_set_key()
+    resources = RelationCache.get_resources(business_concept_id, "business_concept")
+    resource_fix =
+      %{
+        source: %{source_id: business_concept_id, source_type: "business_concept"},
+        target: %{target_id: resources |> hd |> Map.get(:resource_id) |> String.to_integer(),
+                  target_type: resources |> hd |> Map.get(:resource_type)}
+      };
+    RelationCache.delete_relation(resource_fix)
 
     Redix.command(:redix, ["SREM", key_bc_set, business_concept_id])
     Redix.command(:redix, ["DEL", key_bc])
