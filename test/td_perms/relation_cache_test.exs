@@ -122,14 +122,14 @@ defmodule TdPerms.RelationCacheTest do
   test "get_members return member properly" do
     resource_list_fixture()
     result_list = RelationCache.get_members(1, "data_field")
-    
-    assert length(result_list)== 1
+
+    assert length(result_list) == 1
 
     Enum.map(result_list, fn res -> Redix.command(:redix, [
                "EXISTS",
                 res
              ])end)
-    
+
     delete_resources_list()
   end
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.12.2] 2019-02-21
+
+### Added
+
+- [TD-1422] When a BC is deleted, all their relations are deleted too.
+    
 ## [2.12.1] 2019-02-01
 
 ### Added
