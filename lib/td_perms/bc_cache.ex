@@ -104,6 +104,10 @@ defmodule TdPerms.BusinessConceptCache do
     key_bc = create_key(business_concept_id)
     key_bc_set = existing_bc_set_key()
 
+    {:ok, relations} = Redix.command(:redix, ["KEYS", "business_concept:#{business_concept_id}:*"])
+    relations
+    |>Enum.map(fn rel -> Redix.command(:redix, ["DEL", rel])end)
+
     Redix.command(:redix, ["SREM", key_bc_set, business_concept_id])
     Redix.command(:redix, ["DEL", key_bc])
   end
