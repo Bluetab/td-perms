@@ -119,6 +119,62 @@ defmodule TdPerms.RelationCacheTest do
     delete_resources_list()
   end
 
+  test "get_members return member properly" do
+    resource_list_fixture()
+    result_list = RelationCache.get_members(1, "data_field")
+    
+    assert length(result_list)== 1
+
+    Enum.map(result_list, fn res -> Redix.command(:redix, [
+               "EXISTS",
+                res
+             ])end)
+    
+    delete_resources_list()
+  end
+
+  test "get_resources_from_key from different resources" do
+    resource_list_fixture()
+    result_list = RelationCache.get_members(1, "data_field")
+    |> hd
+    |> RelationCache.get_resources_from_key
+
+    assert result_list.resource_id == "18"
+    assert result_list.name == "test_18"
+    assert result_list.business_concept_version_id == "1"
+    assert result_list.relation_type == "business_concept_to_field"
+    assert result_list.resource_type == "business_concept"
+
+    result_list = RelationCache.get_members(18, "business_concept")
+    |> hd
+    |> RelationCache.get_resources_from_key
+
+    assert result_list.resource_id == "1"
+    assert result_list.relation_type == "business_concept_to_field"
+    assert result_list.resource_type == "data_field"
+
+    delete_resources_list()
+  end
+
+  test "delete_element_from_set" do
+
+  Redix.command(:redix, [
+               "SADD",
+               "myset",
+               "business_concept:18:business_concept_to_field"
+             ])
+
+  RelationCache.delete_element_from_set("business_concept:18:business_concept_to_field", "myset")
+
+  assert {:ok, []} =
+             Redix.command(:redix, [
+               "SMEMBERS",
+               "myset"
+             ])
+
+  delete_resources_list()
+  end
+
   defp bc_fixture do
     BusinessConceptCache.put_business_concept(%{
       id: 18,

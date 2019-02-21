@@ -12,6 +12,20 @@ defmodule TdPerms.RelationCache do
     |> Enum.map(&get_additional_attributes(&1))
   end
 
+  def get_members(resource_id, resource_type) do
+    key = create_key(resource_id, resource_type)
+
+    {:ok, resources} = Redix.command(:redix, ["SMEMBERS", key])
+
+    resources
+  end
+
+  def get_resources_from_key(key) do
+    key
+    |> get_common_attributes
+    |> get_additional_attributes
+  end
+
   def get_resources(resource_id, resource_type, %{relation_type: rt_values}) do
     resource_id
     |> get_resources(resource_type)
@@ -56,6 +70,11 @@ defmodule TdPerms.RelationCache do
     {:ok, attr} =
       Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}:#{relation_type}", field])
 
+    attr
+  end
+
+  def delete_element_from_set(element, set) do
+  {:ok, attr} = Redix.command(:redix, ["SREM", set, element])
     attr
   end
 
