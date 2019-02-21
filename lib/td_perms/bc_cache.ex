@@ -3,8 +3,6 @@ defmodule TdPerms.BusinessConceptCache do
     Shared cache for Business Concepts.
   """
 
-  alias TdPerms.RelationCache
-
   def exists_bc_in_cache?(business_concept_id) do
     key = existing_bc_set_key()
     {:ok, result} = Redix.command(:redix, ["SISMEMBER", key, business_concept_id])
