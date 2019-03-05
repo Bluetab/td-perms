@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.15.0] 2019-03-05
+
+### Added
+
+- Functionality for listing templates by scope
+
+### Removed
+
+- Removed obsolete functionality for default templates
+
 ## [2.14.0] 2019-02-21
 
 ### Added

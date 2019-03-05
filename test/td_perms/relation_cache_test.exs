@@ -135,9 +135,11 @@ defmodule TdPerms.RelationCacheTest do
 
   test "get_resources_from_key from different resources" do
     resource_list_fixture()
-    result_list = RelationCache.get_members(1, "data_field")
-    |> hd
-    |> RelationCache.get_resources_from_key
+    data_field_id = 1
+    result_list = data_field_id
+      |> RelationCache.get_members("data_field")
+      |> hd
+      |> RelationCache.get_resources_from_key
 
     assert result_list.resource_id == "18"
     assert result_list.name == "test_18"
@@ -146,12 +148,8 @@ defmodule TdPerms.RelationCacheTest do
     assert result_list.resource_type == "business_concept"
 
     result_list = RelationCache.get_members(18, "business_concept")
-    |> hd
-    |> RelationCache.get_resources_from_key
 
-    assert result_list.resource_id == "1"
-    assert result_list.relation_type == "business_concept_to_field"
-    assert result_list.resource_type == "data_field"
+    assert length(result_list) == 2
 
     delete_resources_list()
   end
