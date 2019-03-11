@@ -28,20 +28,21 @@ defmodule TdPerms.DynamicFormCacheTest do
     assert DynamicFormCache.get_template_by_name("invalid:key") == nil
   end
 
-  test "get_default_template will return the default template" do
-    template = df_fixture_default()
-    DynamicFormCache.put_template(template)
-    assert DynamicFormCache.get_default_template() == Map.drop(template, [:is_default])
+  test "list_templates will return a list of objects" do
+    DynamicFormCache.clean_cache()
+    DynamicFormCache.put_template(df_fixture("t1"))
+    DynamicFormCache.put_template(df_fixture("t2"))
+    DynamicFormCache.put_template(df_fixture("t3"))
+    assert length(DynamicFormCache.list_templates()) == 3
   end
 
-  test "list_templates will return a list of objects" do
-    template1 = df_fixture("t1")
-    template2 = df_fixture("t2")
-    template3 = df_fixture("t3")
-    DynamicFormCache.put_template(template1)
-    DynamicFormCache.put_template(template2)
-    DynamicFormCache.put_template(template3)
-    assert length(DynamicFormCache.list_templates()) >= 3
+  test "list_templates_by_scope will only return template from the requested scope" do
+    DynamicFormCache.clean_cache()
+    DynamicFormCache.put_template(df_scope_fixture("t1", "s1"))
+    DynamicFormCache.put_template(df_scope_fixture("t2", "s2"))
+    DynamicFormCache.put_template(df_scope_fixture("t3", "s1"))
+    DynamicFormCache.put_template(df_scope_fixture("t4", "s3"))
+    assert length(DynamicFormCache.list_templates_by_scope("s1")) == 2
   end
 
   test "delete_template deletes from cache" do
@@ -53,32 +54,41 @@ defmodule TdPerms.DynamicFormCacheTest do
   end
 
   test "clean_cache will remove all records" do
-    template1 = df_fixture("t1")
-    template2 = df_fixture("t2")
-    template3 = df_fixture("t3")
-    DynamicFormCache.put_template(template1)
-    DynamicFormCache.put_template(template2)
-    DynamicFormCache.put_template(template3)
+    DynamicFormCache.put_template(df_fixture("t1"))
+    DynamicFormCache.put_template(df_fixture("t2"))
+    DynamicFormCache.put_template(df_fixture("t3"))
 
     DynamicFormCache.clean_cache()
     assert Enum.empty?(DynamicFormCache.list_templates())
   end
 
   defp df_fixture do
-    %{id: 0, name: "test", content: [%{"name" => "field", "type" => "string"}], label: "label"}
+    %{
+      id: 0,
+      name: "test",
+      content: [%{"name" => "field", "type" => "string"}],
+      label: "label",
+      scope: "scope"
+    }
   end
 
   defp df_fixture(name) do
-    %{id: 0, name: name, content: [%{"name" => "field", "type" => "string"}], label: "label"}
-  end
-
-  defp df_fixture_default do
     %{
       id: 0,
-      name: "test_default",
+      name: name,
       content: [%{"name" => "field", "type" => "string"}],
       label: "label",
-      is_default: true
+      scope: "scope"
+    }
+  end
+
+  defp df_scope_fixture(name, scope) do
+    %{
+      id: 0,
+      name: name,
+      content: [%{"name" => "field", "type" => "string"}],
+      label: "label",
+      scope: scope
     }
   end
 end

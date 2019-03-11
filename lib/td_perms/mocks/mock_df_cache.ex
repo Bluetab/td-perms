@@ -4,7 +4,7 @@ defmodule TdPerms.MockDynamicFormCache do
   """
   use Agent
 
-  @template_fields [:content, :name, :label, :id]
+  @template_fields [:content, :name, :label, :id, :scope]
 
   def start_link(_) do
     Agent.start_link(fn -> %{} end, name: :MockDfCache)
@@ -32,16 +32,16 @@ defmodule TdPerms.MockDynamicFormCache do
     |> Map.get(key)
   end
 
-  def get_default_template do
-    :MockDfCache
-    |> Agent.get(& &1)
-    |> Map.get("df_template_default")
-  end
-
   def list_templates do
     :MockDfCache
     |> Agent.get(& &1)
-    |> Enum.filter(fn {key, _} -> key != "df_template_default" end)
+    |> Enum.map(fn {_, v} -> v end)
+  end
+
+  def list_templates_by_scope(scope) do
+    :MockDfCache
+    |> Agent.get(& &1)
+    |> Enum.filter(fn {_, v} -> v.scope == scope end)
     |> Enum.map(fn {_, v} -> v end)
   end
 
@@ -49,6 +49,7 @@ defmodule TdPerms.MockDynamicFormCache do
         name: template_name,
         content: _,
         label: _,
+        scope: _,
         id: _
       } = template) do
     key = create_key(template_name)
