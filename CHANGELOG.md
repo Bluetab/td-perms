@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.16.0] 2019-03-28
 
 ### Changed
 
