@@ -26,22 +26,18 @@ defmodule TdPerms.RelationCache do
     |> get_additional_attributes
   end
 
-  def get_resources(resource_id, resource_type, %{relation_type: rt_values}) do
-    resource_id
-    |> get_resources(resource_type)
-    |> Enum.filter(fn %{relation_type: relation_type} ->
-      Enum.member?(rt_values, relation_type)
-    end)
-  end
-
   def put_relation(
         resources,
         relation_types
       ) do
     source_target_keys = build_keys(resources)
 
-    relation_types
-    |> Enum.map(&store_resources(source_target_keys, resources, &1))
+    case length(relation_types) do
+      0 -> [store_resources(source_target_keys, resources)]
+      _ ->
+        relation_types
+        |> Enum.map(&store_resources(source_target_keys, resources, &1))
+    end
   end
 
   def delete_relation(resources) do
@@ -61,12 +57,11 @@ defmodule TdPerms.RelationCache do
     |> Enum.map(&delete_resources(source_target_keys, resources, &1))
   end
 
-  def get_resource_attr(field, resource_type, resource_id) do
+  defp get_resource_attr(field, resource_type, resource_id) do
     {:ok, attr} = Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}", field])
     attr
   end
-
-  def get_resource_attr(field, resource_type, resource_id, relation_type) do
+  defp get_resource_attr(field, resource_type, resource_id, relation_type) do
     {:ok, attr} =
       Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}:#{relation_type}", field])
 
@@ -101,6 +96,22 @@ defmodule TdPerms.RelationCache do
       ])
 
     {result_resource_append, result_resource_creation}
+  end
+
+  defp store_resources(
+         {key_source, key_target},
+         %{source: source, target: target}
+       ) do
+    key_resource_source = "#{source.source_type}:#{source.source_id}:"
+    key_resource_target = "#{target.target_type}:#{target.target_id}:"
+
+    result_resource_append =
+      Redix.pipeline(:redix, [
+        ["SADD", key_source, key_resource_target],
+        ["SADD", key_target, key_resource_source]
+      ])
+    # {:ok, ["OK", "OK"]} is forced to fake expected behaviour of cloned method
+    {result_resource_append, {:ok, ["OK", "OK"]}}
   end
 
   defp build_context_from_resources(context) do
