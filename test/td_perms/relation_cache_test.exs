@@ -31,6 +31,17 @@ defmodule TdPerms.RelationCacheTest do
     delete_relation(resources)
   end
 
+  test "put_relation returns creates relations without tag" do
+    {resources, relation_types} = relation_fixture_no_tags()
+    delete_relation(resources)
+
+    put_results = RelationCache.put_relation(resources, relation_types)
+    assert length(put_results) == 1
+    assert Enum.all?(put_results, fn result -> result == {{:ok, [1, 1]}, {:ok, ["OK", "OK"]}} end)
+
+    delete_relation(resources)
+  end
+
   test "put_relation should not insert a relation when it is already persisted" do
     {resources, relation_types} = relation_fixture()
     delete_relation(resources)
@@ -109,11 +120,6 @@ defmodule TdPerms.RelationCacheTest do
     assert length(result_list) == 2
     assert Enum.any?(result_list, &(&1.resource_id == "1"))
     assert Enum.any?(result_list, &(&1.resource_id == "2"))
-    assert Enum.all?(result_list, &(&1.context == %{}))
-
-    result_list = RelationCache.get_resources(18, "business_concept", %{relation_type: ["business_concept_to_field"]})
-    assert length(result_list) == 1
-    assert Enum.any?(result_list, &(&1.resource_id == "1"))
     assert Enum.all?(result_list, &(&1.context == %{}))
 
     delete_resources_list()
@@ -197,6 +203,17 @@ defmodule TdPerms.RelationCacheTest do
         context: %{}
       },
       ["business_concept_to_field", "business_concept_to_field_master"]
+    }
+  end
+
+  defp relation_fixture_no_tags do
+    {
+      %{
+        source: %{source_id: 19, source_type: "business_concept"},
+        target: %{target_id: 4, target_type: "data_field"},
+        context: %{}
+      },
+      []
     }
   end
 

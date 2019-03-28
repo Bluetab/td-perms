@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- RelationCache will create record of untagged relations
+
 ## [2.15.0] 2019-03-10
 
 ### Added
