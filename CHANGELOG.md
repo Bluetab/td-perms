@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.16.1] 2019-04-09
+
+### Changed
+
+- RelationCache will delete record of untagged relations
+
 ## [2.16.0] 2019-03-28
 
 ### Changed
