@@ -53,8 +53,12 @@ defmodule TdPerms.RelationCache do
       ) do
     source_target_keys = build_keys(resources)
 
-    relation_types
-    |> Enum.map(&delete_resources(source_target_keys, resources, &1))
+    case length(relation_types) do
+      0 -> [delete_resources(source_target_keys, resources)]
+      _ ->
+        relation_types
+        |> Enum.map(&delete_resources(source_target_keys, resources, &1))
+    end
   end
 
   defp get_resource_attr(field, resource_type, resource_id) do
@@ -76,7 +80,7 @@ defmodule TdPerms.RelationCache do
   defp store_resources(
          {key_source, key_target},
          %{source: source, target: target, context: context},
-         relation_type
+         relation_type \\ ""
        ) do
     key_resource_source = "#{source.source_type}:#{source.source_id}:#{relation_type}"
     key_resource_target = "#{target.target_type}:#{target.target_id}:#{relation_type}"
@@ -98,22 +102,6 @@ defmodule TdPerms.RelationCache do
     {result_resource_append, result_resource_creation}
   end
 
-  defp store_resources(
-         {key_source, key_target},
-         %{source: source, target: target}
-       ) do
-    key_resource_source = "#{source.source_type}:#{source.source_id}:"
-    key_resource_target = "#{target.target_type}:#{target.target_id}:"
-
-    result_resource_append =
-      Redix.pipeline(:redix, [
-        ["SADD", key_source, key_resource_target],
-        ["SADD", key_target, key_resource_source]
-      ])
-    # {:ok, ["OK", "OK"]} is forced to fake expected behaviour of cloned method
-    {result_resource_append, {:ok, ["OK", "OK"]}}
-  end
-
   defp build_context_from_resources(context) do
     source_context = context |> Map.get("source", %{}) |> Poison.encode!()
     target_context = context |> Map.get("target", %{}) |> Poison.encode!()
@@ -124,7 +112,7 @@ defmodule TdPerms.RelationCache do
   defp delete_resources(
          {key_source, key_target},
          %{source: source, target: target},
-         relation_type
+         relation_type \\ ""
        ) do
     key_resource_source = "#{source.source_type}:#{source.source_id}:#{relation_type}"
     key_resource_target = "#{target.target_type}:#{target.target_id}:#{relation_type}"
