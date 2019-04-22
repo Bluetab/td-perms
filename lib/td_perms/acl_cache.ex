@@ -59,4 +59,14 @@ defmodule TdPerms.AclCache do
     key = create_acl_role_users_key(resource_type, resource_id, role)
     Redix.command(:redix, ["DEL", key])
   end
+
+  def delete_acl_role_user(resource_type, resource_id, role, user) do
+    key = create_acl_role_users_key(resource_type, resource_id, role)
+    users = get_acl_role_users(resource_type, resource_id, role)
+
+    case Enum.member?(users, to_string(user)) do
+      true -> Redix.command(:redix, ["SREM", key, "#{user}"])
+      _ -> {:ok}
+    end
+  end
 end
