@@ -66,4 +66,16 @@ defmodule TdPerms.AclCacheTest do
     key = AclCache.create_acl_role_users_key(resource_id, resource_type, role)
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", "#{key}"])
   end
+
+  test "delete_acl_role_user deletes from cache" do
+    resource_id = 1
+    resource_type = "test_type"
+    role = "role1"
+    users = ["user1", "user2", "user3"]
+    AclCache.set_acl_role_users(resource_id, resource_type, role, users)
+    AclCache.delete_acl_role_user(resource_id, resource_type, role, "user1")
+    key = AclCache.create_acl_role_users_key(resource_id, resource_type, role)
+    {:ok, new_users} = Redix.command(:redix, ["SMEMBERS", "#{key}"])
+    assert 2 = Enum.count(new_users)
+  end
 end
