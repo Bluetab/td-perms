@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.16.3] 2019-04-23
+
+### Added
+
+- Mock for business_concept cache
+
 ## [2.16.2] 2019-04-23
 
 ### Added
