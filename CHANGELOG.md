@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.16.2] 2019-04-23
+
+### Added
+
+- Function to delete an user from an acl
+
 ## [2.16.1] 2019-04-09
 
 ### Changed
