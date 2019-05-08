@@ -35,6 +35,7 @@ defmodule TdPerms.BusinessConceptCache do
         id: business_concept_id,
         domain_id: parent_id,
         name: name,
+        current_version: current_version,
         business_concept_version_id: business_concept_version_id
       }) do
     key_bc = create_key(business_concept_id)
@@ -50,7 +51,9 @@ defmodule TdPerms.BusinessConceptCache do
       "name",
       name,
       "business_concept_version_id",
-      business_concept_version_id
+      business_concept_version_id,
+      "current_version",
+      current_version
     ])
   end
 
@@ -110,6 +113,22 @@ defmodule TdPerms.BusinessConceptCache do
 
     Redix.command(:redix, ["SREM", key_bc_set, business_concept_id])
     Redix.command(:redix, ["DEL", key_bc])
+  end
+
+  def put_bc_parent(%{
+        id: business_concept_id,
+        parent_id: parent_id
+      }) do
+    value = "#{business_concept_id}:#{parent_id}"
+    Redix.command(:redix, ["SADD", "bg:bc_parents", value])
+  end
+
+  def get_bc_parents!() do
+    {:ok, members} = Redix.command(:redix, ["SMEMBERS", "bg:bc_parents"])
+
+    members
+      |> Enum.map(&String.split(&1, ":"))
+      |> Enum.map(fn [id, parent_id] -> {id, parent_id} end)
   end
 
   def create_key(business_concept_id) do
