@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.16.4] 2019-05-08
+
+### Added
+
+- Temporary methods for storing deprecated parent_id of business_concepts
+
 ## [2.16.3] 2019-04-23
 
 ### Added
