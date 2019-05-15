@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.19.1] 2019-05-15
+
+### Fixed
+
+- BusinessConceptCache backwards compatibility issue introduced in 2.19.0
+
 ## [2.19.0] 2019-05-08
 
 ### Added

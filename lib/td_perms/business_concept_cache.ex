@@ -1,6 +1,6 @@
 defmodule TdPerms.BusinessConceptCache do
   @moduledoc """
-    Shared cache for Business Concepts.
+  Shared cache for Business Concepts.
   """
 
   def exists_bc_in_cache?(business_concept_id) do
@@ -31,13 +31,15 @@ defmodule TdPerms.BusinessConceptCache do
     bc_version_id
   end
 
-  def put_business_concept(%{
-        id: business_concept_id,
-        domain_id: parent_id,
-        name: name,
-        current_version: current_version,
-        business_concept_version_id: business_concept_version_id
-      }) do
+  def put_business_concept(
+        %{
+          id: business_concept_id,
+          domain_id: parent_id,
+          name: name,
+          business_concept_version_id: business_concept_version_id
+        } = business_concept
+      ) do
+    current_version = Map.get(business_concept, :current_version)
     key_bc = create_key(business_concept_id)
     key_bc_set = existing_bc_set_key()
 
@@ -107,9 +109,11 @@ defmodule TdPerms.BusinessConceptCache do
     key_bc = create_key(business_concept_id)
     key_bc_set = existing_bc_set_key()
 
-    {:ok, relations} = Redix.command(:redix, ["KEYS", "business_concept:#{business_concept_id}:*"])
+    {:ok, relations} =
+      Redix.command(:redix, ["KEYS", "business_concept:#{business_concept_id}:*"])
+
     relations
-    |> Enum.each(fn rel -> Redix.command(:redix, ["DEL", rel])end)
+    |> Enum.each(fn rel -> Redix.command(:redix, ["DEL", rel]) end)
 
     Redix.command(:redix, ["SREM", key_bc_set, business_concept_id])
     Redix.command(:redix, ["DEL", key_bc])
@@ -127,8 +131,8 @@ defmodule TdPerms.BusinessConceptCache do
     {:ok, members} = Redix.command(:redix, ["SMEMBERS", "bg:bc_parents"])
 
     members
-      |> Enum.map(&String.split(&1, ":"))
-      |> Enum.map(fn [id, parent_id] -> {id, parent_id} end)
+    |> Enum.map(&String.split(&1, ":"))
+    |> Enum.map(fn [id, parent_id] -> {id, parent_id} end)
   end
 
   def create_key(business_concept_id) do
