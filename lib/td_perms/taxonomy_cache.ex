@@ -60,7 +60,7 @@ defmodule TdPerms.TaxonomyCache do
       42
 
   """
-  @since "2.8.0"
+  @doc since: "2.8.0"
   def get_domain_name_to_id_map do
     {:ok, keys} = Redix.command(:redix, ["KEYS", "domain:*"])
 
@@ -89,7 +89,7 @@ defmodule TdPerms.TaxonomyCache do
       [true, true, false, true]
 
   """
-  @since "2.8.1"
+  @doc since: "2.8.1"
   def get_root_domain_ids do
     {:ok, domain_ids} = Redix.command(:redix, ["SMEMBERS", root_domains_key()])
 
