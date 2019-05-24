@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.20.1] 2019-05-24
+
+## Added 
+
+- [TD-1535] Function to query a permission from an ingest resource 
+
 ## [2.20.0] 2019-05-24
 
 ## Added 
