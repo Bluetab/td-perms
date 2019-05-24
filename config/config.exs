@@ -65,7 +65,8 @@ config :td_perms, permissions: [
   :view_versioned_ingests,
   :view_rejected_ingests,
   :view_deprecated_ingests,
-  :manage_confidential_structures
+  :manage_confidential_structures,
+  :manage_ingest_relations
 ]
 
 # It is also possible to import configuration files, relative to this
