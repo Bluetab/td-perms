@@ -3,6 +3,7 @@ defmodule TdPerms.Permissions do
   Shared cache for permissions.
   """
   alias TdPerms.BusinessConceptCache
+  alias TdPerms.IngestCache
   alias TdPerms.TaxonomyCache
 
   @permissions Application.get_env(:td_perms, :permissions) |> Enum.with_index() |> Map.new()
@@ -31,6 +32,12 @@ defmodule TdPerms.Permissions do
   def has_permission?(session_id, permission, "business_concept", business_concept_id) do
     business_concept_id
     |> BusinessConceptCache.get_parent_id
+    |> (&has_permission?(session_id, permission, "domain", &1)).()
+  end
+
+  def has_permission?(session_id, permission, "ingest", ingest_id) do
+    ingest_id
+    |> IngestCache.get_parent_id
     |> (&has_permission?(session_id, permission, "domain", &1)).()
   end
 
