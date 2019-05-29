@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unrelease]
+
+## Changed 
+
+- [TD-1824] change relation cache key to use links suffix
+
 ## [2.20.1] 2019-05-24
 
 ## Added 

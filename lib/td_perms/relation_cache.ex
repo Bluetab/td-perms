@@ -194,6 +194,6 @@ defmodule TdPerms.RelationCache do
   end
 
   defp create_key(resource_id, resource_type) do
-    "#{resource_type}:#{resource_id}:relations"
+    "links:#{resource_type}:#{resource_id}"
   end
 end
