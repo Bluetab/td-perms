@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.21.1] 2019-05-30
+
+## Changed 
+
+- [TD-1782] added field to structure cache
+
 ## [2.21.0] 2019-05-29
 
 ## Changed 

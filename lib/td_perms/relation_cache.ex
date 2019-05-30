@@ -66,8 +66,9 @@ defmodule TdPerms.RelationCache do
     attr
   end
   defp get_resource_attr(field, resource_type, resource_id, relation_type) do
+    key = create_relation_type_key(resource_type, resource_id, relation_type)
     {:ok, attr} =
-      Redix.command(:redix, ["HGET", "#{resource_type}:#{resource_id}:#{relation_type}", field])
+      Redix.command(:redix, ["HGET", key, field])
 
     attr
   end
@@ -82,8 +83,8 @@ defmodule TdPerms.RelationCache do
          %{source: source, target: target, context: context},
          relation_type \\ ""
        ) do
-    key_resource_source = "#{source.source_type}:#{source.source_id}:#{relation_type}"
-    key_resource_target = "#{target.target_type}:#{target.target_id}:#{relation_type}"
+    key_resource_source = create_relation_type_key(source.source_type, source.source_id, relation_type)
+    key_resource_target = create_relation_type_key(target.target_type, target.target_id, relation_type)
 
     {source_context, target_context} = build_context_from_resources(context)
 
@@ -114,8 +115,8 @@ defmodule TdPerms.RelationCache do
          %{source: source, target: target},
          relation_type \\ ""
        ) do
-    key_resource_source = "#{source.source_type}:#{source.source_id}:#{relation_type}"
-    key_resource_target = "#{target.target_type}:#{target.target_id}:#{relation_type}"
+    key_resource_source = create_relation_type_key(source.source_type, source.source_id, relation_type)
+    key_resource_target = create_relation_type_key(target.target_type, target.target_id, relation_type)
 
     result_deletion_from_set =
       Redix.pipeline(:redix, [
@@ -144,7 +145,7 @@ defmodule TdPerms.RelationCache do
   end
 
   defp get_common_attributes(resource) do
-    [resource_type, resource_id, relation_type] = resource |> String.split(":")
+    ["relation_type", resource_type, resource_id, relation_type] = resource |> String.split(":")
 
     Map.new()
     |> Map.put(:resource_id, resource_id)
@@ -195,5 +196,9 @@ defmodule TdPerms.RelationCache do
 
   defp create_key(resource_id, resource_type) do
     "links:#{resource_type}:#{resource_id}"
+  end
+
+  defp create_relation_type_key(resource_type, resource_id, relation_type) do
+    "relation_type:#{resource_type}:#{resource_id}:#{relation_type}"
   end
 end

@@ -16,13 +16,13 @@ defmodule TdPerms.RelationCacheTest do
              result_source =
                Redix.command(:redix, [
                  "EXISTS",
-                 "#{resources.source.source_type}:#{resources.source.source_id}:#{r_t}"
+                 "relation_type:#{resources.source.source_type}:#{resources.source.source_id}:#{r_t}"
                ])
 
              result_target =
                Redix.command(:redix, [
                  "EXISTS",
-                 "#{resources.target.target_type}:#{resources.target.target_id}:#{r_t}"
+                 "relation_type:#{resources.target.target_type}:#{resources.target.target_id}:#{r_t}"
                ])
 
              {:ok, 1} == result_source && {:ok, 1} == result_target
@@ -69,13 +69,13 @@ defmodule TdPerms.RelationCacheTest do
     assert {:ok, 0} =
              Redix.command(:redix, [
                "EXISTS",
-               "#{source.source_type}:#{source.source_id}:relations"
+               "links:#{source.source_type}:#{source.source_id}"
              ])
 
     assert {:ok, 0} =
              Redix.command(:redix, [
                "EXISTS",
-               "#{target.target_type}:#{target.target_id}:relations"
+               "links:#{target.target_type}:#{target.target_id}"
              ])
 
     delete_relation(resources)
@@ -94,13 +94,13 @@ defmodule TdPerms.RelationCacheTest do
     assert {:ok, 1} =
              Redix.command(:redix, [
                "EXISTS",
-               "#{source.source_type}:#{source.source_id}:relations"
+               "links:#{source.source_type}:#{source.source_id}"
              ])
 
     assert {:ok, 0} =
              Redix.command(:redix, [
                "EXISTS",
-               "#{target.target_type}:#{target.target_id}:relations"
+               "links:#{target.target_type}:#{target.target_id}"
              ])
 
     delete_resources_list()
