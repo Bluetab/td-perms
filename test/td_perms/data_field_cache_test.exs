@@ -22,6 +22,30 @@ defmodule TdPerms.DataFieldCacheTest do
     assert {:ok, 0} = Redix.command(:redix, ["EXISTS", key])
   end
 
+  test "write field_to_structure value" do
+    field_id = "10"
+    structure_id = "5"
+    field_to_structure = %{
+      field_id: field_id,
+      structure_id: structure_id
+    }
+    DataFieldCache.set_field_to_structure(field_to_structure)
+    
+    key = DataFieldCache.create_field_to_structure_key(field_id)
+    assert {:ok, ^structure_id} = Redix.command(:redix, ["GET", key])
+  end
+
+  test "get field_to_structure value" do
+    field_id = "8"
+    structure_id = "9"
+    
+    key = DataFieldCache.create_field_to_structure_key(field_id)
+    Redix.command(:redix, ["SET", key, structure_id])
+    
+    return_value = DataFieldCache.get_structure_from_field(field_id)
+    assert return_value == structure_id
+  end
+
   defp data_field_fixture do
     %{system: "system", group: "group", structure: "structure", field: "field", external_id: "external_id"}
   end
