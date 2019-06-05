@@ -30,6 +30,13 @@ defmodule TdPerms.MockBusinessConceptCache do
     |> Map.get("business_concept_version_id")
   end
 
+  def get_existing_business_concept_set do
+    key = BusinessConceptCache.existing_bc_set_key()
+    :MockBcCache
+    |> Agent.get(& &1)
+    |> Map.get(key)
+  end
+
   def put_business_concept(%{
         id: business_concept_id,
         domain_id: parent_id,

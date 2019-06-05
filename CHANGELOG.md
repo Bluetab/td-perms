@@ -1,26 +1,32 @@
 # Changelog
 
+## [2.21.2] 2019-06-05
+
+## Added
+
+- [TD-1811] added missing function on mock BC cache
+
 ## [2.21.1] 2019-05-30
 
-## Changed 
+## Changed
 
 - [TD-1782] added field to structure cache
 
 ## [2.21.0] 2019-05-29
 
-## Changed 
+## Changed
 
 - [TD-1824] change relation cache key to use links suffix
 
 ## [2.20.1] 2019-05-24
 
-## Added 
+## Added
 
-- [TD-1535] Function to query a permission from an ingest resource 
+- [TD-1535] Function to query a permission from an ingest resource
 
 ## [2.20.0] 2019-05-24
 
-## Added 
+## Added
 
 - [TD-1535] Permission manage_ingest_relations
 
@@ -75,13 +81,13 @@
 ### Added
 
 - [TD-1422] When a BC is deleted, all their relations are deleted too.
-    
+
 ## [2.12.1] 2019-02-01
 
 ### Added
 
 - [TD-967] Contextual information will be stored when a relation in persisted on cache.
-    - The information will be persisted for both, the target and source of a relation.
+  - The information will be persisted for both, the target and source of a relation.
 
 ## [2.12.0] 2019-01-28
 
