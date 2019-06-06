@@ -1,6 +1,12 @@
 # Changelog
 
-## [2.21.4] 2019-06-07
+## [2.21.5] 2019-06-06
+
+### Added
+
+- [TD-1850] added missing function `get_bc_parents!/1` to `MockBusinessConceptCache`
+
+## [2.21.4] 2019-06-06
 
 ### Added
 

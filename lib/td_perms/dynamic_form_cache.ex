@@ -1,6 +1,6 @@
 defmodule TdPerms.DynamicFormCache do
   @moduledoc """
-    Shared cache for Dynamic Forms.
+  Shared cache for Dynamic Forms.
   """
   def get_template_content(template_name) do
     key = create_key(template_name)
@@ -15,12 +15,16 @@ defmodule TdPerms.DynamicFormCache do
   def get_template_by_name("df_template:" <> template_name) do
     get_template_by_name(template_name)
   end
+
   def get_template_by_name(template_name) do
     key = create_key(template_name)
     template_fields = ["id", "content", "label", "scope"]
     {:ok, [id, content, label, scope]} = Redix.command(:redix, ["HMGET", key] ++ template_fields)
+
     case content do
-      nil -> nil
+      nil ->
+        nil
+
       content ->
         %{
           id: parse_id(id),
@@ -33,6 +37,7 @@ defmodule TdPerms.DynamicFormCache do
   end
 
   defp parse_id(nil), do: nil
+
   defp parse_id(id_str) do
     case Integer.parse(id_str) do
       :error -> nil
@@ -47,9 +52,10 @@ defmodule TdPerms.DynamicFormCache do
 
   def list_templates_by_scope(scope) do
     {:ok, keys} = Redix.command(:redix, ["KEYS", create_key("*")])
+
     keys
-      |> Enum.map(&get_template_by_name(&1))
-      |> Enum.filter(&(&1.scope == scope))
+    |> Enum.map(&get_template_by_name(&1))
+    |> Enum.filter(&(&1.scope == scope))
   end
 
   def put_template(%{
@@ -78,6 +84,7 @@ defmodule TdPerms.DynamicFormCache do
   def delete_template("df_template:" <> template_name) do
     delete_template(template_name)
   end
+
   def delete_template(template_name) do
     key = create_key(template_name)
     Redix.command(:redix, ["DEL", key])
