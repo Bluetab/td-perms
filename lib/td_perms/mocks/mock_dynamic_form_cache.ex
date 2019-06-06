@@ -16,6 +16,7 @@ defmodule TdPerms.MockDynamicFormCache do
 
   def get_template_content(template_name) do
     key = create_key(template_name)
+
     :MockDfCache
     |> Agent.get(& &1)
     |> Map.get(key, %{content: nil})
@@ -25,8 +26,10 @@ defmodule TdPerms.MockDynamicFormCache do
   def get_template_by_name("df_template:" <> template_name) do
     get_template_by_name(template_name)
   end
+
   def get_template_by_name(template_name) do
     key = create_key(template_name)
+
     :MockDfCache
     |> Agent.get(& &1)
     |> Map.get(key)
@@ -45,29 +48,33 @@ defmodule TdPerms.MockDynamicFormCache do
     |> Enum.map(fn {_, v} -> v end)
   end
 
-  def put_template(%{
-        name: template_name,
-        content: _,
-        label: _,
-        scope: _,
-        id: _
-      } = template) do
+  def put_template(
+        %{
+          name: template_name,
+          content: _,
+          label: _,
+          scope: _,
+          id: _
+        } = template
+      ) do
     key = create_key(template_name)
 
     Agent.update(:MockDfCache, fn mock ->
       clean_template = Map.take(template, @template_fields)
       new_mock = Map.put(mock, key, clean_template)
+
       case Map.get(template, :is_default, false) do
         true -> Map.put(new_mock, "df_template_default", clean_template)
         _ -> new_mock
       end
     end)
+
     {:ok, "OK"}
   end
 
   def delete_template(template_name) do
     key = create_key(template_name)
-    Agent.update(:MockDfCache, & Map.drop(&1, [key]))
+    Agent.update(:MockDfCache, &Map.drop(&1, [key]))
     {:ok, "OK"}
   end
 

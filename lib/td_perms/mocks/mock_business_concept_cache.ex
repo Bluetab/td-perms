@@ -16,6 +16,7 @@ defmodule TdPerms.MockBusinessConceptCache do
 
   def get_name(business_concept_id) do
     key = BusinessConceptCache.create_key(business_concept_id)
+
     :MockBcCache
     |> Agent.get(& &1)
     |> Map.get(key)
@@ -24,6 +25,7 @@ defmodule TdPerms.MockBusinessConceptCache do
 
   def get_business_concept_version_id(business_concept_id) do
     key = BusinessConceptCache.create_key(business_concept_id)
+
     :MockBcCache
     |> Agent.get(& &1)
     |> Map.get(key)
@@ -32,6 +34,7 @@ defmodule TdPerms.MockBusinessConceptCache do
 
   def get_existing_business_concept_set do
     key = BusinessConceptCache.existing_bc_set_key()
+
     :MockBcCache
     |> Agent.get(& &1)
     |> Map.get(key)
@@ -53,11 +56,13 @@ defmodule TdPerms.MockBusinessConceptCache do
     end)
 
     Agent.update(:MockBcCache, fn mock ->
-      new_item = mock
+      new_item =
+        mock
         |> Map.get(key_bc, %{})
         |> Map.put("parent_id", parent_id)
         |> Map.put("name", name)
         |> Map.put("business_concept_version_id", business_concept_version_id)
+
       Map.put(mock, key_bc, new_item)
     end)
   end
@@ -74,8 +79,10 @@ defmodule TdPerms.MockBusinessConceptCache do
   end
 
   def get_field_values(_, []), do: %{}
+
   def get_field_values(business_concept_id, fields) do
     key = BusinessConceptCache.create_key(business_concept_id)
+
     :MockBcCache
     |> Agent.get(& &1)
     |> Map.get(key, %{})
@@ -95,6 +102,7 @@ defmodule TdPerms.MockBusinessConceptCache do
 
   def decrement(business_concept_id, field) do
     key = BusinessConceptCache.create_key(business_concept_id)
+
     Agent.update(:MockBcCache, fn mock ->
       old_item = Map.get(mock, key, %{})
       old_value = Map.get(old_item, field, 0)
@@ -103,4 +111,6 @@ defmodule TdPerms.MockBusinessConceptCache do
     end)
   end
 
+  # TODO: Implement this
+  def get_bc_parents!(), do: []
 end
