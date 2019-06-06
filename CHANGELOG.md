@@ -1,32 +1,38 @@
 # Changelog
 
+## [2.21.3] 2019-06-06
+
+### Removed
+
+- [TD-1850] removed deprecated module TdPerms.FieldLinkCache
+
 ## [2.21.2] 2019-06-05
 
-## Added
+### Added
 
 - [TD-1811] added missing function on mock BC cache
 
 ## [2.21.1] 2019-05-30
 
-## Changed
+### Changed
 
 - [TD-1782] added field to structure cache
 
 ## [2.21.0] 2019-05-29
 
-## Changed
+### Changed
 
 - [TD-1824] change relation cache key to use links suffix
 
 ## [2.20.1] 2019-05-24
 
-## Added
+### Added
 
 - [TD-1535] Function to query a permission from an ingest resource
 
 ## [2.20.0] 2019-05-24
 
-## Added
+### Added
 
 - [TD-1535] Permission manage_ingest_relations
 
