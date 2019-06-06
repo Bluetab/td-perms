@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.21.4] 2019-06-07
+
+### Added
+
+- [TD-1702] New permission view_data_structures_profile
+
 ## [2.21.3] 2019-06-06
 
 ### Removed
