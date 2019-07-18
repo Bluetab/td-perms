@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.2.0] 2019-07-17
+
+### Added
+
+- [TD-1776] add new permission view_quality_rule
+
 ## [2.21.5] 2019-06-06
 
 ### Added
